@@ -1,0 +1,5 @@
+class Av_FODivide:Av_FOperator{
+    override
+    double Apply(double X) const
+    {return Main.Apply(super.Apply(X))/Operand.Apply(super.Apply(X));}
+}

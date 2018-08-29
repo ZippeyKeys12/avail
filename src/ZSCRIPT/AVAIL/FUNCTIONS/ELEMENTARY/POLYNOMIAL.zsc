@@ -1,0 +1,12 @@
+class Av_FPolynomial:Av_FBase{
+    override
+    Av_FBase Init(){
+        if(!Misc)
+            Misc=2;
+        return self;
+    }
+
+    override
+    double Apply(double X) const
+    {return super.Apply(X)**Misc;}
+}

@@ -1,0 +1,19 @@
+class Av_Object abstract{
+    protected
+    void Error(String Msg)
+    {Cl_Util.Log(GetClassName(), LOG_Error, Msg);}
+
+    protected
+    void Fatal(String Msg)
+    {Cl_Util.Log(GetClassName(), LOG_Fatal, Msg);}
+}
+
+class Av_Thinker:Thinker abstract{
+    protected
+    void Error(String Msg)
+    {Cl_Util.Log(GetClassName(), LOG_Error, Msg);}
+
+    protected
+    void Fatal(String Msg)
+    {Cl_Util.Log(GetClassName(), LOG_Fatal, Msg);}
+}

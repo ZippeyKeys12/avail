@@ -1,0 +1,103 @@
+class Av_Quaternion{
+    private
+    double W, X, Y, Z;
+
+    static
+    Av_Quaternion Create(double W, double X, double Y, double Z)
+    {return new('Av_Quaternion').Init(W, X, Y, Z);}
+
+    static
+    Av_Quaternion Zero()
+    {return Create(0, 0, 0, 0);}
+
+    static
+    Av_Quaternion Identity()
+    {return Create(1, 0, 0, 0);}
+
+    static
+    Av_Quaternion FromAngleAxis(double Angle, Vector3 Axis){
+        Angle*=.5;
+        Axis=Sin(Angle)*Axis.Unit();
+        return Create(Cos(Angle), Axis.x, Axis.y, Axis.z);
+    }
+
+    static
+    Av_Quaternion FromEulerAngles(double Yaw, double Pitch, double Roll)
+    {return new('Av_Quaternion').SetEulerAngles(Yaw, Pitch, Roll);}
+
+    private
+    Av_Quaternion Init(double W, double X, double Y, double Z){
+        self.W=W;
+        self.X=X;
+        self.Y=Y;
+        self.Z=Z;
+        return self;
+    }
+
+    Av_Quaternion SetEulerAngles(double Yaw, double Pitch, double Roll)
+    {return Equal(FromAngleAxis(Yaw, (0, 0, 1)).QMul(FromAngleAxis(Pitch, (0, 1, 0))).QMul(FromAngleAxis(Roll, (1, 0, 0))));}
+
+    double Length() const
+    {return sqrt(LengthSquared());}
+
+    double LengthSquared() const
+    {return W**2+X**2+Y**2+Z**2;}
+
+    Av_Quaternion Negative() const
+    {return Create(-W, -X, -Y, -Z);}
+
+    Av_Quaternion Unit() const
+    {return SDiv(Length());}
+
+    Av_Quaternion Inverse() const
+    {return Conjugate().SDiv(LengthSquared());}
+
+    Av_Quaternion Conjugate() const
+    {return Create(W, -X, -Y, -Z);}
+
+    Av_Quaternion Add(Av_Quaternion Other) const
+    {return Create(W+Other.W, X+Other.X, Y+Other.Y, Z+Other.Z);}
+
+    Av_Quaternion Sub(Av_Quaternion Other) const
+    {return Add(Other.Negative());}
+
+    Av_Quaternion SMul(double Multiplier) const
+    {return Create(W*Multiplier, X*Multiplier, Y*Multiplier, Z*Multiplier);}
+
+    Av_Quaternion SDiv(double Divisor) const
+    {return Create(W/Divisor, X/Divisor, Y/Divisor, Z/Divisor);}
+
+    Av_Quaternion QMul(Av_Quaternion Other) const
+    {return Create(W*Other.W-X*Other.X-Y*Other.Y-Z*Other.Z,
+                   W*Other.X+X*Other.W+Y*Other.Z-Z*Other.Y,
+                   W*Other.Y+Y*Other.W+Z*Other.X-X*Other.Z,
+                   W*Other.Z+Z*Other.W+X*Other.Y-Y*Other.X);}
+
+    double DotProduct(Av_Quaternion Other) const
+    {return W*Other.W+X*Other.X+Y*Other.Y+Z*Other.Z;}
+
+    Av_Quaternion Equal(Av_Quaternion Other){
+        W=Other.W;
+        X=Other.X;
+        Y=Other.Y;
+        Z=Other.Z;
+        return self;
+    }
+
+    bool Equals(Av_Quaternion Other) const
+    {return W~==Other.W && X~==Other.X && Y~==Other.Y && Z~==Other.Z;}
+
+    bool IsZero() const
+    {return LengthSquared()~==0;}
+
+    bool IsIdentity() const
+    {return Equals(Identity());}
+
+    double, double, double GetEulerAngles() const{
+        double SinP=2*(W*Y-Z*X),
+               YSquared=Y**2,
+               Pitch=(Abs(SinP)>=1)?Av_Calc_S.TransferSign(90, SinP):ASin(SinP);
+        if(Abs(Pitch)>=89.9999)return 2*ATan2(X, W), Pitch, 0;
+        return ATan2(2*(W*Z+X*Y), 1-2*(YSquared+Z**2)), Pitch, ATan2(2*(W*X+Y*Z), 1-2*(YSquared+X**2));
+    }
+}

@@ -1,0 +1,87 @@
+class Av_Calc_S:Av_Singleton{
+    static
+    bool Equals(double FirstValue, double SecondValue, double Epsilon=double.Epsilon)
+    {return Abs(FirstValue-SecondValue)<=Epsilon;}
+
+    static
+    int ShiftOf(int Value){
+        int Shifts=0;
+        while(Value>1){
+            Value>>=1;
+            Shifts++;
+        }
+        return Shifts;
+    }
+
+    static
+    int Sign(double Value)
+    {return !Equals(Value, 0)*((Value<0)?-1:1);}
+
+    static
+    double TransferSign(double Value, double Sign)
+    {return Abs(Value)*Sign(Sign);}
+
+    static
+    int Alternate(int n, bool Offset=false)
+    {return -1**(n-Offset);}
+
+    static
+    int Round(double Value)
+    {return (Value+.5);}
+
+    static
+    double NormRangeMap(double Value, double Start, double End)
+    {return Clamp((Value-Start)/(End-Start), 0, 1);}
+
+    static
+    double ANormRangeMap(double Value, double Start, double End)
+    {return Clamp(Value*(End-Start)+Start, Start, End);}
+
+    static
+    int IRangeMap(int Value, int OldStart, int OldEnd, int NewStart, int NewEnd)
+    {return ANormRangeMap(Clamp((Value-OldStart)/(OldEnd-OldStart), 0, 1), NewStart, NewEnd);}
+
+    static
+    double DRangeMap(double Value, double OldStart, double OldEnd, double NewStart, double NewEnd)
+    {return ANormRangeMap(NormRangeMap(Value, OldStart, OldEnd), NewStart, NewEnd);}
+
+    static
+    uint Factorial(uint N){
+        if(N>0)
+            return N*Factorial(N-1);
+        else if(N==0)
+            return 1;
+        else
+            Cl_Util.Log('Av_Calc', LOG_Fatal, "Attempted factorial of a negative number");
+        return 0;
+    }
+
+    static
+    int nCr(int N, int K){
+        if(K==0 || N==K)
+            return 1;
+        return nCr(N-1, K-1)+nCr(N-1, K);
+    }
+
+    static
+    int NthTriNumber(int N)
+    {return N*(N+1)/2;}
+
+    static
+    double Lerp(double Time, double Start=0, double End=1){
+        Time=Clamp(Time, 0, 1);
+        return (1-Time)*Start+Time*End;
+    }
+
+    static
+    double SmoothStart(double Time, double Start=0, double End=1, double Degree=2)
+    {return ANormRangeMap(NormRangeMap(Time, Start, End)**Degree, Start, End);}
+
+    static
+    double SmoothStop(double Time, double Start=0, double End=1, double Degree=2)
+    {return ANormRangeMap(1-(1-NormRangeMap(Time, Start, End))**Degree, Start, End);}
+
+    static
+    double SmoothStep(double Time, double Start=0, double End=1, double Degree=2)
+    {return Lerp(Time, SmoothStart(Time, Start, End, Degree), SmoothStop(Time, Start, End, Degree));}
+}

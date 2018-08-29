@@ -1,0 +1,201 @@
+class Av_Vector:Av_Object{
+    private
+    uint __Length__;
+
+    Array<double> Values;
+
+    static
+    Av_Vector Create(uint Length, bool Ones=false){
+        Av_Vector Result=new('Av_Vector');
+        Result.__Length__=Length;
+        for(int i=0; i<Length; i++)
+            Result.Values.Push(Ones);
+        return Result;
+    }
+
+    static
+    Av_Vector Randomized(uint Length, double Floor=-1, double Ceiling=1, int Seed=0){
+        Av_Vector Result=Create(Length, true).Noise(Floor, Ceiling, Seed);
+        return Result;
+    }
+
+    static
+    Av_Vector FromV2(Vector2 Vec){
+        Av_Vector Result=Create(2);
+        Result.Set(0, Vec.X);
+        Result.Set(1, Vec.Y);
+        return Result;
+    }
+
+    static
+    Av_Vector FromV3(Vector3 Vec){
+        Av_Vector Result=Create(3);
+        Result.Set(0, Vec.X);
+        Result.Set(1, Vec.Y);
+        Result.Set(2, Vec.Z);
+        return Result;
+    }
+
+    //////////
+    // Info //
+    //////////
+
+    double Get(uint Index) const
+    {return Values[Index];}
+
+    uint Size() const
+    {return __Length__;}
+
+    double Length() const
+    {return Sqrt(LengthSquared());}
+
+    double LengthSquared() const
+    {return VDot(Clone());}
+
+    Av_Vector Midpoint(Av_Vector Other) const
+    {return Add(Other).SDiv(2);}
+
+    ///////////////////
+    // Manipulations //
+    ///////////////////
+
+    virtual
+    void Set(uint Index, double Value)
+    {Values[Index]=Value;}
+
+    Av_Vector Add(Av_Vector Other) const{
+        if(__Length__!=Other.__Length__)
+            Cl_Util.Log(GetClassName(), LOG_Fatal, "Attempted to add differently-sized vectors");
+        Av_Vector Result=Create(__Length__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]+Other.Values[i];
+        return Result;
+    }
+
+    Av_Vector Sub(Av_Vector Other) const{
+        if(__Length__!=Other.__Length__)
+            Fatal("Attempted to subtract differently-sized vectors");
+        Av_Vector Result=Create(__Length__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]-Other.Values[i];
+        return Result;
+    }
+
+    Av_Vector Mul(Av_Vector Other) const{
+        if(__Length__!=Other.__Length__)
+            Fatal("Attempted to multiply differently-sized vectors");
+        Av_Vector Result=Create(__Length__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]*Other.Values[i];
+        return Result;
+    }
+
+    Av_Vector Div(Av_Vector Other) const{
+        if(__Length__!=Other.__Length__)
+            Fatal("Attempted to divide differently-sized vectors");
+        Av_Vector Result=Create(__Length__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]/Other.Values[i];
+        return Result;
+    }
+
+    virtual
+    Av_Vector Map(Av_FBase Function) const{
+        Av_Vector Result=Create(__Length__);
+        for(int i=0; i<__Length__; i++)
+            Result.Values[i]=Function.Apply(Values[i]);
+        return Result;
+    }
+
+    Av_Vector SMul(double Multiplier){
+        Av_Vector Result=Av_Vector.Create(__Length__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]*Multiplier;
+        return Result;
+    }
+
+    Av_Vector SDiv(double Divisor){
+        Av_Vector Result=Av_Vector.Create(__Length__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]/Divisor;
+        return Result;
+    }
+
+    Av_Vector SExponent(double Degree){
+        Av_Vector Result=Av_Vector.Create(__Length__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]**Degree;
+        return Result;
+    }
+
+    double VDot(Av_Vector Other) const{
+        if(__Length__!=Other.Size())
+            Fatal("Attempted to dot incorrectly-sized vectors");
+        double Total=0;
+        for(int Index=0; Index<__Length__; Index++)
+            Total+=Get(Index)*Other.Get(Index);
+        return Total;
+    }
+
+    Av_Vector M2Mul(Av_Matrix2 Other) const
+    {return ToM2(__Length__==Other.Height()).M2Mul(Other).ToV();}
+
+    Av_Vector SClamp(double Min, double Max){
+        Av_Vector Result=Create(__Length__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Clamp(Values[i], Min, Max);
+        return Result;
+    }
+
+    Av_Vector Noise(double Floor, double Ceiling, int Seed=0) const{
+        if(!Seed)
+            Seed=Av_Util.RandSeed();
+        SetRandomSeed[NoiseyBoi](Seed);
+        Av_Vector Result=Create(__Length__);
+        for(int Index=0; Index<Values.Size(); Index++)
+            Result.Values[Index]=Values[Index]*FRandom[NoiseyBoi](Floor, Ceiling);
+        return Result;
+    }
+
+    Av_Vector Clip(uint StartIndex, uint EndIndex){
+        Av_Vector Result=Create(EndIndex-StartIndex);
+        for(int i=0; i<Result.Size(); i++)
+            Result.Set(i, Get(StartIndex+i));
+        return Result;
+    }
+
+    ////////////////
+    // Transforms //
+    ////////////////
+
+    Av_Vector Unit() const
+    {return Clone().SDiv(Length());}
+
+    Vector2 ToV2() const{
+        if(__Length__!=2 && __Length__!=3)
+            Fatal("Attempted to convert Av_Vector to Vector2: Is not 2 or 3 values");
+        return (Values[0], Values[1]);
+    }
+
+    Vector3 ToV3() const{
+        if(__Length__!=3 && __Length__!=4)
+            Fatal("Attempted to convert Av_Vector to Vector3: Is not 3 or 4 values");
+        Vector3 Result=(Values[0], Values[1], Values[2]);
+        if(__Length__==4)
+            Result/=Values[3];
+        return Result;
+    }
+
+    Av_Matrix2 ToM2(bool AsRow=false) const{
+        Av_Matrix2 Result=Av_Matrix2.Create((AsRow)?1:__Length__, (!AsRow)?1:__Length__);
+        Result.Values.Copy(Values);
+        return Result;
+    }
+
+    virtual
+    Av_Vector Clone() const{
+        Av_Vector Result=Create(__Length__);
+        Result.Values.Copy(Values);
+        return Result;
+    }
+}

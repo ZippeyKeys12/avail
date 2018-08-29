@@ -1,0 +1,5 @@
+class Av_FHyperCosine:Av_FBase{
+    override
+    double Apply(double X) const
+    {return CosH(super.Apply(X));}
+}

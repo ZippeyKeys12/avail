@@ -1,0 +1,16 @@
+struct Av_Screen{
+    static
+    Vector2 Size()
+    {return (Screen.GetWidth(), Screen.GetHeight());}
+
+    static
+    double AspectRatio()
+    {return Screen.GetAspectRatio();}
+
+    static
+    double FoVV(double FoVH){
+        double Ratio=AspectRatio();
+        double FoVRatio=(Ratio>=1.3)?1.333333:Ratio;
+        return 2*ATan(Tan(FoVH/2)/FoVRatio);
+    }
+}

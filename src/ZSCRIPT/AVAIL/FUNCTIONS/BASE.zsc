@@ -1,0 +1,140 @@
+class Av_FLinear:Av_FBase{}
+
+class Av_FBase:Av_Object{
+    double Misc;
+
+    Av_FBase Child;
+
+    static
+    Av_FBase Create(Name Type, double Misc=0){
+        Type='Av_F'..Type;
+        if(!Av_Util.ClassExists(Type)){
+            Cl_Util.Log('', LOG_Fatal, Type.." does not exist");
+            return null;
+        }else{
+            Av_FBase Result=Av_FBase(new(Type));
+            Result.Misc=Misc;
+            return Result.Init();
+        }
+    }
+
+    virtual
+    Av_FBase Init()
+    {return self;}
+
+    virtual
+    double Apply(double X) const{
+        if(Child)
+            X=Child.Apply(X);
+        return X;
+    }
+
+    virtual
+    Av_FBase Attach(Av_FBase Function){
+        if(Child)
+            Error("Function already has child");
+        Child=Function;
+        return self;
+    }
+
+    virtual
+    void Detach()
+    {Child=null;}
+
+    ////////////////
+    // Operations //
+    ////////////////
+
+    Av_FBase Add(Av_FBase Other)
+    {return Av_FBase(Av_FOperator.Create('Add', self, Other));}
+
+    Av_FBase Sub(Av_FBase Other)
+    {return Av_FBase(Av_FOperator.Create('Subtract', self, Other));}
+
+    Av_FBase Mul(Av_FBase Other)
+    {return Av_FBase(Av_FOperator.Create('Multiply', self, Other));}
+
+    Av_FBase Div(Av_FBase Other)
+    {return Av_FBase(Av_FOperator.Create('Divide', self, Other));}
+
+    Av_FBase SAdd(double Constant)
+    {return Add(Av_FBase.Create('Constant', Constant));}
+
+    Av_FBase SSub(double Constant)
+    {return Sub(Av_FBase.Create('Constant', Constant));}
+
+    Av_FBase SMul(double Constant)
+    {return Mul(Av_FBase.Create('Constant', Constant));}
+
+    Av_FBase SDiv(double Constant)
+    {return Div(Av_FBase.Create('Constant', Constant));}
+
+    /////////////////////
+    // Transformations //
+    /////////////////////
+
+    Av_FBase VShift(double Value)
+    {return SAdd(Value);}
+
+    // TODO: Deep copy for non-destructive operations
+    Av_FBase HShift(double Value){
+        Array<Av_FBase> Stack;
+        Stack.Push(Clone());
+        bool HasLeaf;
+        for(int i=0; i<Stack.Size();i++){
+            HasLeaf=false;
+            if(Stack[i].Child){
+                Stack.Push(Stack[i].Child);
+                HasLeaf=true;
+            }
+            if(Stack[i] is 'Av_FOperator'){
+                Stack.Push(Av_FOperator(Stack[i]).Main);
+                Stack.Push(Av_FOperator(Stack[i]).Operand);
+                HasLeaf=true;
+            }
+            if(HasLeaf){
+                Stack.Delete(i);
+                i--;
+            }
+        }
+        for(int i=0; i<Stack.Size(); i++)
+            Stack[i].Attach(Create('Linear').SAdd(-Value));
+        return self;
+    }
+
+    Av_FBase VDilate(double Value)
+    {return SMul(Value);}
+
+    Av_FBase HDilate(double Value){
+        Array<Av_FBase> Stack;
+        Stack.Push(Clone());
+        bool HasLeaf;
+        for(int i=0; i<Stack.Size();i++){
+            HasLeaf=false;
+            if(Stack[i].Child){
+                Stack.Push(Stack[i].Child);
+                HasLeaf=true;
+            }
+            if(Stack[i] is 'Av_FOperator'){
+                Stack.Push(Av_FOperator(Stack[i]).Main);
+                Stack.Push(Av_FOperator(Stack[i]).Operand);
+                HasLeaf=true;
+            }
+            if(HasLeaf){
+                Stack.Delete(i);
+                i--;
+            }
+        }
+        for(int i=0; i<Stack.Size(); i++)
+            Stack[i].Attach(Create('Linear').SMul(1/Value));
+        return self;
+    }
+
+    virtual
+    Av_FBase Clone() const{
+        Av_FBase Result=Av_FBase(new(GetClassName()));
+        Result.Misc=Misc;
+        Result.Child=Child.Clone();
+        return Result.Init();
+    }
+}

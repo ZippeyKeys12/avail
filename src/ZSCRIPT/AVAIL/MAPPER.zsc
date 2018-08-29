@@ -1,0 +1,51 @@
+class Av_Mapper{
+    double OMin,
+           OMax,
+           FMin,
+           FMax;
+
+    static
+    Av_Mapper Create(double OMin, double OMax, double FMin=0, double FMax=0){
+        Av_Mapper Mapper=new('Av_Mapper');
+        Mapper.OMin=OMin;
+        Mapper.OMax=OMax;
+        if(!FMin && !FMax){
+            Mapper.FMin=OMin;
+            Mapper.FMax=OMax;
+        }else{
+            Mapper.FMin=FMin;
+            Mapper.FMax=FMax;
+        }
+        return Mapper;
+    }
+
+    double NormRangeMap(double Value) const
+    {return Clamp((Value-OMin)/(OMax-OMin), 0, 1);}
+
+    double ANormRangeMap(double Value) const
+    {return Clamp(Value*(FMax-FMin)+FMin, FMin, FMax);}
+
+    double RangeMap(double Value) const
+    {return ANormRangeMap(NormRangeMap(Value));}
+
+    Av_Vector VNormRangeMap(Av_Vector Other) const{
+        Av_Vector Result=Other.Clone();
+        for(int i=0; i<Other.Values.Size(); i++)
+            Result.Values[i]=NormRangeMap(Other.Values[i]);
+        return Result;
+    }
+
+    Av_Vector VANormRangeMap(Av_Vector Other) const{
+        Av_Vector Result=Other.Clone();
+        for(int i=0; i<Other.Values.Size(); i++)
+            Result.Values[i]=ANormRangeMap(Other.Values[i]);
+        return Result;
+    }
+
+    Av_Vector VRangeMap(Av_Vector Other) const{
+        Av_Vector Result=Other.Clone();
+        for(int i=0; i<Other.Values.Size(); i++)
+            Result.Values[i]=RangeMap(Other.Values[i]);
+        return Result;
+    }
+}

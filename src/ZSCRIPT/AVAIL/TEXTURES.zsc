@@ -1,0 +1,55 @@
+struct Av_Texture{
+    enum Av_EUseTypes{
+        Type_Any,
+        Type_Wall,
+        Type_Flat,
+        Type_Sprite,
+        Type_WallPatch,
+        Type_Build,
+        Type_SkinSprite,
+        Type_Decal,
+        Type_MiscPatch,
+        Type_FontChar,
+        Type_Override,	// For patches between TX_START/TX_END
+        Type_Autopage,	// Automap background - used to enable the use of FAutomapTexture
+        Type_SkinGraphic,
+        Type_Null,
+        Type_FirstDefined,
+    };
+
+    static
+    TextureID Get(Name Tex, Av_EUseTypes Type=Type_Any)
+    {return TexMan.CheckForTexture(Tex, Type);}
+
+    static
+    TextureID Any(Name Tex)
+    {return Get(Tex, Type_Any);}
+
+    static
+    TextureID Wall(Name Tex)
+    {return Get(Tex, Type_Wall);}
+
+    static
+    TextureID Flat(Name Tex)
+    {return Get(Tex, Type_Flat);}
+
+    static
+    TextureID Sprite(Name Tex)
+    {return Get(Tex, Type_Sprite);}
+
+    static
+    TextureID Decal(Name Tex)
+    {return Get(Tex, Type_Decal);}
+
+    static
+    TextureID Misc(Name Tex)
+    {return Get(Tex, Type_MiscPatch);}
+
+    static
+    Vector2 Size(TextureID Tex)
+    {return TexMan.GetScaledSize(Tex);}
+
+    static
+    Vector2 SizeFor(Name Tex)
+    {return TexMan.GetScaledSize(Get(Tex));}
+}

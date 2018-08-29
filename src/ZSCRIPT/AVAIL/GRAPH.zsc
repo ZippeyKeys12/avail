@@ -1,0 +1,106 @@
+class Av_Graph:Av_Object{
+    Array<Av_Node> Nodes;
+
+    Av_Plan GetPlan(Av_Node StartNode, Av_Node GoalNode){
+        uint Index=Nodes.Find(StartNode);
+        if(Index==Nodes.Size() || Nodes.Find(GoalNode)==Nodes.Size())
+            Fatal("Node doesn't exist");
+        Array<Av_Node> Open,
+                     Closed,
+                     CameFrom;
+        Open.Push(StartNode);
+        CameFrom.Resize(Nodes.Size());
+        Array<double> GCosts,
+                      FCosts;
+        for(int i=0; i<Nodes.Size(); i++)
+            GCosts.Push(double.MAX);
+        GCosts[Index]=0;
+        for(int i=0; i<Nodes.Size(); i++)
+            FCosts.Push(double.MAX);
+        FCosts[Index]=StartNode.DistanceTo(GoalNode);
+        while(Open.Size()>0){
+            Av_Node CurrentNode=Open[Open.Size()-1];
+            if(CurrentNode==GoalNode){
+                Av_Plan Plan=new('Av_Plan');
+                while(CurrentNode){
+                    Plan.Nodes.Push(CurrentNode);
+                    CurrentNode=CameFrom[Nodes.Find(CurrentNode)];
+                }
+                return Plan;
+            }
+            Open.Pop();
+            Closed.Push(CurrentNode);
+            Index=Nodes.Find(CurrentNode);
+            for(int i=0; i<CurrentNode.Edges.Size(); i++){
+                Av_Edge CurrentEdge=CurrentNode.Edges[i];
+                Av_Node NextNode=CurrentEdge.To;
+                if(Closed.Find(NextNode)!=Closed.Size() || Nodes.Find(NextNode)==Nodes.Size())
+                    continue;
+                if(Open.Find(NextNode)==Open.Size())
+                    Open.Push(NextNode);
+                uint NextIndex=Nodes.Find(NextNode);
+                double GCost=GCosts[Index]+CurrentEdge.Cost;
+                if(GCost>=GCosts[NextIndex])
+                    continue;
+                CameFrom[NextIndex]=CurrentNode;
+                GCosts[NextIndex]=GCost;
+                FCosts[NextIndex]=GCost+NextNode.DistanceTo(GoalNode);
+            }
+            for(int i=0; i<Open.Size(); i++){
+                uint IndexOfMax=i;
+                for(int j=i+1; j<Open.Size(); j++){
+                    if(FCosts[Nodes.Find(Open[j])]>FCosts[Nodes.Find(Open[IndexOfMax])])
+                        IndexOfMax=j;
+                }
+                if(IndexOfMax!=i){
+                    Av_Node Temp=Open[i];
+                    Open[i]=Open[IndexOfMax];
+                    Open[IndexOfMax]=Temp;
+                }
+            }
+        }
+        return null;
+    }
+}
+
+class Av_Plan:Av_Object{
+    Array<Av_Node> Nodes;
+
+    Av_Node Peek()
+    {return Nodes[Nodes.Size()-1];}
+
+    Av_Node Pop(){
+        Av_Node Last=Peek();
+        Nodes.Pop();
+        return Last;
+    }
+
+    uint Size()
+    {return Nodes.Size();}
+}
+
+class Av_Node:Av_Object abstract{
+    Array<Av_Edge> Edges;
+
+    static
+    Av_Node Create(Class<Av_Node> Type)
+    {return Av_Node(new(Type));}
+
+    virtual
+    double DistanceTo(Av_Node Other)
+    {return 0;}
+}
+
+class Av_Edge:Av_Object{
+    double Cost;
+
+    Av_Node To;
+
+    static
+    Av_Edge Create(Class<Av_Edge> Type, Av_Node From, Av_Node To){
+        Av_Edge Result=Av_Edge(new(Type));
+        Result.Cost=From.DistanceTo(To);
+        Result.To=To;
+        return Result;
+    }
+}

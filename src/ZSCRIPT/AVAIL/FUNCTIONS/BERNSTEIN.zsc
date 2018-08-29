@@ -1,0 +1,24 @@
+class Av_FBernstein:Av_FBase{
+    int N,
+        I;
+
+    static
+    Av_FBernstein Create(int N, int I){
+        Av_FBernstein Result=Av_FBernstein(Av_FBase.Create('Bernstein', Av_Calc_S.nCr(N, I)));
+        Result.N=N;
+        Result.I=I;
+        return Result;
+    }
+
+    override
+    double Apply(double X) const
+    {return Misc*super.Apply(X)**I*(1-super.Apply(X))**(N-I);}
+
+    override
+    Av_FBase Clone() const{
+        Av_FBernstein Result=Av_FBernstein(super.Clone());
+        Result.N=N;
+        Result.I=I;
+        return Result;
+    }
+}

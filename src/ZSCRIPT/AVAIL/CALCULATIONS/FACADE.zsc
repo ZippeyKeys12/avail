@@ -1,0 +1,17 @@
+struct Av_Calc{
+    static
+    Av_Calc_S S()
+    {return Av_Calc_S(Av_Singletons.DataGet('Av_Calc_S'));}
+
+    static
+    Av_Calc_V2 V2()
+    {return Av_Calc_V2(Av_Singletons.DataGet('Av_Calc_V2'));}
+
+    static
+    Av_Calc_V3 V3()
+    {return Av_Calc_V3(Av_Singletons.DataGet('Av_Calc_V3'));}
+
+    static
+    Av_Calc_Q Q()
+    {return Av_Calc_Q(Av_Singletons.DataGet('Av_Calc_Q'));}
+}

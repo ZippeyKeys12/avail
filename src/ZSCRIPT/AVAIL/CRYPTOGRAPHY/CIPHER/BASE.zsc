@@ -1,0 +1,24 @@
+class Av_Cipher:Av_Object abstract{
+    protected
+    String Key;
+
+    static
+    Av_Cipher Create(Name Type, String Key){
+        Type='Av_C'..Type;
+        if(!Av_Util.ChildOf(Type, 'Av_Cipher')){
+            Cl_Util.Log('', LOG_Fatal, Type.." does not exist");
+            return null;
+        }
+        Av_Cipher Result=Av_Cipher(new(Type));
+        Result.Key=Key;
+        return Result;
+    }
+
+    virtual
+    String Encrypt(String Str)
+    {return Str;}
+
+    virtual
+    String Decrypt(String Str)
+    {return Str;}
+}

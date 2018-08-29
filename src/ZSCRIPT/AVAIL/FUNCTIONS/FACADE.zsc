@@ -1,0 +1,58 @@
+struct Av_Function{
+
+    //////////////
+    // Creation //
+    //////////////
+
+    static
+    Av_FBase Line(double Slope)
+    {return Av_FBase.Create('Linear').VDilate(Slope);}
+
+    static
+    Av_FBase Poly(double Degree=2)
+    {return Av_FBase.Create('Polynomial', Degree);}
+
+    static
+    Av_FBase Exp(double Base=Av_Util.E, double Asymptote=0)
+    {return Av_FBase.Create('Exponential', Base).VShift(Asymptote);}
+
+    static
+    Av_FBase Log(double Base=Av_Util.E, double Asymptote=0)
+    {return Av_FBase.Create('Logarithm', Base).HShift(Asymptote);}
+
+    static
+    Av_FBase Sin(double Amplitude=1, double Period=360)
+    {return Av_FBase.Create('Sine').VDilate(Amplitude).HDilate(Period/360);}
+
+    static
+    Av_FBase Cos(double Amplitude=1, double Period=360)
+    {return Av_FBase.Create('Cosine').VDilate(Amplitude).HDilate(Period/360);}
+
+    static
+    Av_FBase Tan(double Period=180)
+    {return Av_FBase.Create('Tangent').HDilate(Period/180);}
+
+    static
+    Av_FBase ASin()
+    {return Av_FBase.Create('ArcSine');}
+
+    static
+    Av_FBase ACos()
+    {return Av_FBase.Create('ArcCosine');}
+
+    static
+    Av_FBase ATan()
+    {return Av_FBase.Create('ArcTangent');}
+
+    static
+    Av_FBase SinH()
+    {return Av_FBase.Create('HyperSine');}
+
+    static
+    Av_FBase CosH()
+    {return Av_FBase.Create('HyperCosine');}
+
+    static
+    Av_FBase TanH()
+    {return Av_FBase.Create('HyperTangent');}
+}

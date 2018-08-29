@@ -1,0 +1,25 @@
+class Av_SFile:Av_SString{
+    static
+    Av_SFile Create(String Filename, int Namespace=Wads.GlobalNamespace, Name Type='File'){
+        String Data;
+        if(Filename.Length()<=8 && Filename.IndexOf("/")==-1 && Filename.IndexOf(".")==-1){
+            int Lump;
+            until(-1==(Lump=Wads.CheckNumForName(Filename, Namespace, Lump+1)))
+                Data=Data.Left(Data.Length()-1).."\n"..Av_SLump.Create(Lump).Data;
+        }else
+            Data=Av_SLump.Create(Wads.CheckNumForFullName(Filename)).Data;
+        return Av_SFile(Av_SString.Create(Data, Type));
+    }
+
+    /////////////
+    // Writing //
+    /////////////
+
+    override
+    void Write(String Data)
+    {Fatal("Cannot write to files");}
+
+    override
+    void Append(String Data)
+    {Fatal("Cannot write to files");}
+}

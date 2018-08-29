@@ -1,0 +1,434 @@
+class Av_Matrix2:Av_Object{
+    //////////
+    // Data //
+    //////////
+
+    private
+    uint __Height__,
+         __Width__;
+
+    Array<double> Values;
+
+    //////////////
+    // Creation //
+    //////////////
+
+    static
+    Av_Matrix2 Create(uint Height, uint Width, bool Ones=false){
+        Av_Matrix2 Result=new('Av_Matrix2');
+        if(Height<=0 || Width<=0)
+            Result.Fatal("Attempted to create a non-positively-sized matrix");
+        Result.__Height__=Height;
+        Result.__Width__=Width;
+        for(int i=0; i<Height*Width; i++)
+            Result.Values.Push(Ones);
+        return Result;
+    }
+
+    static
+    Av_Matrix2 Identity(uint Size){
+        Av_Matrix2 Result=Create(Size, Size);
+        for(int i=0; i<Size; i++)
+            Result.Set(i, i, 1);
+        return Result;
+    }
+
+    static
+    Av_Matrix2 Randomized(uint Height, uint Width, double Floor=-1, double Ceiling=1, int Seed=0)
+    {return Create(Height, Width, true).Noise(Floor, Ceiling, Seed);}
+
+    //////////
+    // Info //
+    //////////
+
+    double Get(uint Row, uint Column) const
+    {return Values[Row*__Width__+Column];}
+
+    Av_Matrix2 Row(uint Index) const{
+        Av_Matrix2 Result=Create(1, __Width__);
+        for(int i=0; i<__Width__; i++)
+            Result.Set(0, i, Get(Index, i));
+        return Result;
+    }
+
+    Av_Matrix2 AsRow() const{
+        Av_Matrix2 Result=Create(1, Values.Size());
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i];
+        return Result;
+    }
+
+    uint Height() const
+    {return __Height__;}
+
+    Av_Matrix2 Col(uint Column) const{
+        Av_Matrix2 Result=Create(__Height__, 1);
+        for(int i=0; i<__Height__; i++)
+            Result.Set(i, 0, Get(i, Column));
+        return Result;
+    }
+
+    Av_Matrix2 AsCol() const{
+        Av_Matrix2 Result=Create(Values.Size(), 1);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i];
+        return Result;
+    }
+
+    uint Width() const
+    {return __Width__;}
+
+    // All Values
+
+    double ASum() const{
+        double Total=0;
+        for(int i=0; i<Values.Size(); i++)
+            Total+=Values[i];
+        return Total;
+    }
+
+    double AMin() const{
+        double Min=Values[0];
+        for(int i=1; i<Values.Size(); i++)
+            Min=Min(Min, Values[i]);
+        return Min;
+    }
+
+    double AMax() const{
+        double Max=Values[0];
+        for(int i=1; i<Values.Size(); i++)
+            Max=Max(Max, Values[i]);
+        return Max;
+    }
+
+    double ARange() const
+    {return AMax()-AMin();}
+
+    double AAMean() const
+    {return ASum()/Values.Size();}
+
+    double AGMean() const{
+        double Total=1;
+        for(int i=0; i<Values.Size(); i++)
+            Total*=Values[i];
+        return Total**(1./Values.Size());
+    }
+
+    double AHMean() const
+    {return Values.Size()/SExponent(-1).ASum();}
+
+    double AVariance(bool Statistic=true) const{
+        double Total=0,
+               Mean=AAMean();
+        for(int i=0; i<Values.Size(); i++)
+            Total+=(Values[i]-Mean)**2;
+        return Total/(Values.Size()-Statistic);
+    }
+
+    double AStdDev(bool Statistic=true) const
+    {return Sqrt(AVariance());}
+
+    // Per Row/Column
+
+    Av_Vector TSum(bool ForRows=false) const{
+        int Size=(ForRows)?__Height__:__Width__;
+        Av_Vector Result=Av_Vector.Create(Size);
+        for(int i=0; i<Size; i++){
+            if(ForRows)
+                Result.Values[i]=Row(i).ASum();
+            else Result.Values[i]=Col(i).ASum();
+        }
+        return Result;
+    }
+
+    Av_Vector TMin(bool ForRows=false) const{
+        int Size=(ForRows)?__Height__:__Width__;
+        Av_Vector Result=Av_Vector.Create(Size);
+        for(int i=0; i<Size; i++){
+            if(ForRows)
+                Result.Values[i]=Row(i).AMin();
+            else Result.Values[i]=Col(i).AMin();
+        }
+        return Result;
+    }
+
+    Av_Vector TMax(bool ForRows=false) const{
+        int Size=(ForRows)?__Height__:__Width__;
+        Av_Vector Result=Av_Vector.Create(Size);
+        for(int i=0; i<Size; i++){
+            if(ForRows)
+                Result.Values[i]=Row(i).AMax();
+            else Result.Values[i]=Col(i).AMax();
+        }
+        return Result;
+    }
+
+    Av_Vector TRange(bool ForRows=false) const{
+        return TMax(ForRows).Sub(TMin(ForRows));
+    }
+
+    Av_Vector TAMean(bool ForRows=false) const{
+        int Size=(ForRows)?__Height__:__Width__;
+        Av_Vector Result=Av_Vector.Create(Size);
+        for(int i=0; i<Size; i++){
+            if(ForRows)
+                Result.Values[i]=Row(i).AAMean();
+            else Result.Values[i]=Col(i).AAMean();
+        }
+        return Result;
+    }
+
+    Av_Vector TGMean(bool ForRows=false) const{
+        int Size=(ForRows)?__Height__:__Width__;
+        Av_Vector Result=Av_Vector.Create(Size);
+        for(int i=0; i<Size; i++){
+            if(ForRows)
+                Result.Values[i]=Row(i).AGMean();
+            else Result.Values[i]=Col(i).AGMean();
+        }
+        return Result;
+    }
+
+    Av_Vector THMean(bool ForRows=false) const{
+        int Size=(ForRows)?__Height__:__Width__;
+        Av_Vector Result=Av_Vector.Create(Size);
+        for(int i=0; i<Size; i++){
+            if(ForRows)
+                Result.Values[i]=Row(i).AHMean();
+            else Result.Values[i]=Col(i).AHMean();
+        }
+        return Result;
+    }
+
+    Av_Vector TVariance(bool Statistic=true, bool ForRows=false) const{
+        int Size=(ForRows)?__Height__:__Width__;
+        Av_Vector Result=Av_Vector.Create(Size);
+        for(int i=0; i<Size; i++){
+            if(ForRows)
+                Result.Values[i]=Row(i).AVariance();
+            else Result.Values[i]=Col(i).AVariance();
+        }
+        return Result;
+    }
+
+    Av_Vector TStdDev(bool Statistic=true, bool ForRows=false) const
+    {return TVariance(Statistic, ForRows).SExponent(.5);}
+
+    ///////////////////
+    // Manipulations //
+    ///////////////////
+
+    virtual
+    void Set(uint Row, uint Column, double Value)
+    {Values[Row*__Width__+Column]=Value;}
+
+    virtual
+    void Swap(uint ORow, uint OColumn, uint NRow, uint NColumn){
+        double Temp=Get(ORow, OColumn);
+        Set(ORow, OColumn, Get(NRow, NColumn));
+        Set(NRow, NColumn, Temp);
+    }
+
+    virtual
+    Av_Matrix2 Add(Av_Matrix2 Other) const{
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__)
+            Fatal("Attempted to add differently-sized matrices");
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]+Other.Values[i];
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 Sub(Av_Matrix2 Other) const{
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__)
+            Fatal("Attempted to subtract differently-sized matrices");
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]-Other.Values[i];
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 Mul(Av_Matrix2 Other){
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__)
+            Fatal("Attempted to multiply differently-sized matrices");
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]*Other.Values[i];
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 Div(Av_Matrix2 Other){
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__)
+            Fatal("Attempted to multiply differently-sized matrices");
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]/Other.Values[i];
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 Map(Av_FBase Function) const{
+        Av_Matrix2 Result=Create(__Height__, __Width__);
+        for(int i=0; i<__Height__*__Width__; i++)
+            Result.Values[i]=Function.Apply(Values[i]);
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 SMul(double Multiplier) const{
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]*Multiplier;
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 SDiv(double Divisor) const{
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]/Divisor;
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 SExponent(double Degree){
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]**Degree;
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 M2Mul(Av_Matrix2 Other) const{
+        if(__Width__!=Other.__Height__)
+            Fatal("Attempted to multiply incorrectly-sized matrices");
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, Other.__Width__);
+        for(int Row=0; Row<Result.__Height__; Row++)
+            for(int Column=0; Column<Result.__Width__; Column++){
+                double Value=0;
+                for(int i=0; i<__Width__; i++)
+                    Value+=Get(Row, i)*Other.Get(i, Column);
+                Result.Set(Row, Column, Value);
+            }
+        return Result;
+    }
+
+    Av_Vector VMul(Av_Vector Other) const
+    {return M2Mul(Other.ToM2(__Width__!=Other.Size())).ToV();}
+
+    Av_Matrix2 SMin(double Min, double Min2=int.max) const{
+        Av_Matrix2 Result=Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Min(Values[i], Min, Min2);
+        return Result;
+    }
+
+    Av_Matrix2 M2Min(Av_Matrix2 Min, Av_Matrix2 Min2=null) const{
+        if(__Height__!=Min.__Height__ || __Width__!=Min.__Width__ || (Min2 && (__Height__!=Min2.__Height__ || __Width__!=Min2.__Width__)))
+            Fatal("Attempted to min differently-sized matrices");
+        Av_Matrix2 Result=Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Min(Values[i], Min.Values[i], (Min2)?Min2.Values[i]:int.max);
+        return Result;
+    }
+
+    Av_Matrix2 SMax(double Max, double Max2=int.min) const{
+        Av_Matrix2 Result=Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Max(Values[i], Max, Max2);
+        return Result;
+    }
+
+    Av_Matrix2 M2Max(Av_Matrix2 Max, Av_Matrix2 Max2=null) const{
+        if(__Height__!=Max.__Height__ || __Width__!=Max.__Width__ || (Max2 && (__Height__!=Max2.__Height__ || __Width__!=Max2.__Width__)))
+            Fatal("Attempted to min differently-sized matrices");
+        Av_Matrix2 Result=Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Max(Values[i], Max.Values[i], (Max2)?Max2.Values[i]:int.min);
+        return Result;
+    }
+
+    Av_Matrix2 SClamp(double Min, double Max) const{
+        Av_Matrix2 Result=Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Clamp(Values[i], Min, Max);
+        return Result;
+    }
+
+    Av_Matrix2 M2Clamp(Av_Matrix2 Min, Av_Matrix2 Max) const{
+        if(__Height__!=Min.__Height__ || __Width__!=Min.__Width__ || __Height__!=Max.__Height__ || __Width__!=Max.__Width__)
+            Fatal("Attempted to min differently-sized matrices");
+        Av_Matrix2 Result=Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Clamp(Values[i], Min.Values[i], Max.Values[i]);
+        return Result;
+    }
+
+    Av_Matrix2 Transpose() const{
+        Av_Matrix2 Result=Create(__Width__, __Height__);
+        for(int Row=0; Row<__Height__; Row++)
+            for(int Column=0; Column<__Width__; Column++)
+                Result.Set(Column, Row, Get(Row, Column));
+        return Result;
+    }
+
+    Av_Matrix2 Mutate(double Floor=0, double Ceiling=1, double MaxChange=1, double MutationRate=.1, int Seed=0) const{
+        Av_Matrix2 Result=Randomized(__Height__, __Width__, Seed: Seed).SMul(MaxChange),
+                Chance=Randomized(__Height__, __Width__, 0, Seed:Seed+1).SMax(MutationRate);
+        for(int i=0; i<Values.Size(); i++)
+            if(Chance.Values[i]<=MutationRate)
+                Result.Values[i]=Clamp(Values[i]+Result.Values[i], Floor, Ceiling);
+            else Result.Values[i]=Values[i];
+        return Result;
+    }
+
+    Av_Matrix2 Noise(double Floor=-1, double Ceiling=1, int Seed=0) const{
+        if(!Seed)
+            Seed=Av_Util.RandSeed();
+        SetRandomSeed[NoiseyBoi](Seed);
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int Row=0; Row<__Height__; Row++)
+            for(int Column=0; Column<__Width__; Column++)
+                Result.Set(Row, Column, Get(Row, Column)*FRandom[NoiseyBoi](Floor, Ceiling));
+        return Result;
+    }
+
+    Av_Matrix2 SmoothNoise(int Octave) const{
+        Av_Matrix2 Result=Create(__Height__, __Width__);
+        int Period=2**Octave;
+        double Frequency=1/Period;
+        for(int i=0; i<__Height__; i++){
+            int i1=i/Period*Period,
+                i2=(i1+Period)%__Height__;
+            float HBlend=(i-i1)*Frequency;
+            for(int j=0; j<__Width__; j++){
+                int j1=(j/Period)*Period,
+                    j2=(j1+Period)%__Width__;
+                Result.Set(i, j, Av_Calc_S.Lerp((j-j1)*Frequency, Av_Calc_S.Lerp(HBlend, Get(i1, j1), Get(i2, j1)), Av_Calc_S.Lerp(HBlend, Get(i1, j2), Get(i2, j2))));
+            }
+        }
+        return Result;
+    }
+
+    /////////////////////
+    // Transformations //
+    /////////////////////
+    Vector3 ToV3()
+    {return (Values[0], Values[1], Values[2]);}
+
+    Av_Vector ToV(){
+        Av_Vector Result=Av_Vector.Create(Values.Size());
+        Result.Values.Copy(Values);
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 Clone() const{
+        Av_Matrix2 Result=Create(__Height__, __Width__);
+        Result.Values.Copy(Values);
+        return Result;
+    }
+}

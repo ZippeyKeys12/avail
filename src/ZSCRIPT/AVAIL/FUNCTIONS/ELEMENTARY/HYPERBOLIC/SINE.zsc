@@ -1,0 +1,5 @@
+class Av_FHyperSine:Av_FBase{
+    override
+    double Apply(double X) const
+    {return SinH(super.Apply(X));}
+}

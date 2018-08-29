@@ -1,0 +1,50 @@
+extend
+class Av_Matrix2{
+    static
+    Av_Matrix2 Identity_2D()
+    {return Identity(3);}
+
+    static
+    Av_Matrix2 Translate_2D(Vector2 Displacement){
+        Av_Matrix2 Result=Identity_2D();
+        Result.Set(0, 2, Displacement.X);
+        Result.Set(1, 2, Displacement.Y);
+        return Result;
+    }
+
+    static
+    Av_Matrix2 Scale_2D(Vector2 Scale){
+        Av_Matrix2 Result=Identity_2D();
+        Result.Set(0, 0, Scale.X);
+        Result.Set(1, 1, Scale.Y);
+        return Result;
+    }
+
+    static
+    Av_Matrix2 Rotate_2D(double Angle){
+        Av_Matrix2 Result=Identity_2D();
+        until(-360<Angle && Angle<360)
+            Angle%=360;
+        Result.Set(0, 0,  Cos(Angle));
+        Result.Set(0, 1,  Sin(Angle));
+        Result.Set(1, 0, -Sin(Angle));
+        Result.Set(1, 1,  Cos(Angle));
+        return Result;
+    }
+
+    static
+    Av_Matrix2 Shear_2D(Vector2 Shear){
+        Av_Matrix2 Result=Identity_2D();
+        until(-360<Shear.X && Shear.X<360)
+            Shear.X%=360;
+        until(-360<Shear.Y && Shear.Y<360)
+            Shear.Y%=360;
+        Result.Set(0, 1, Tan(Shear.X));
+        Result.Set(1, 0, Tan(Shear.Y));
+        return Result;
+    }
+
+    static
+    Av_Matrix2 Reflect_2D(bool X, bool Y)
+    {return Scale_2D(((Y)?-1:1, (X)?-1:1));}
+}

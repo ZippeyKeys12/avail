@@ -1,0 +1,33 @@
+struct Av_Util{
+    const E=2.718281828459;
+    const PI=3.14159265359;
+
+    static
+    int RandSeed(Object Caller=null)
+    {return Random(int.min, int.max)^((Caller)?int(Caller.GetClassName()):0);}
+
+    static
+    bool ClassExists(Name ClassName){
+        Class Type=ClassName;
+        return Type;
+    }
+
+    static
+    bool ChildOf(Name ClassName, Name ParentClass){
+        Class Parent=ParentClass;
+        Class Type=ClassName;
+        return Type is Parent;
+    }
+
+    static
+    String TransferCase(String Value, String DesCase){
+        String Orig=DesCase;
+        DesCase.ToLower();
+        if(Orig==DesCase)
+            Value.ToLower();
+        DesCase.ToUpper();
+        if(Orig==DesCase)
+            Value.ToUpper();
+        return Value;
+    }
+}

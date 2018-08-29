@@ -1,0 +1,5 @@
+class Av_FHyperTangent:Av_FBase{
+    override
+    double Apply(double X) const
+    {return TanH(super.Apply(X));}
+}

@@ -1,0 +1,5 @@
+class Av_FArcTangent:Av_FBase{
+    override
+    double Apply(double X) const
+    {return ATan(super.Apply(X));}
+}

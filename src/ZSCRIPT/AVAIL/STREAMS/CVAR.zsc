@@ -1,0 +1,59 @@
+class Av_SCVar:Av_Stream{
+    protected
+    transient
+    CVar Data;
+
+    static
+    Av_SCVar Create(String CVarName, Name Type='CVar'){
+        CVar Data=CVar.FindCVar(CVarName);
+        if(Data.GetRealType()!=CVar.CVAR_String)
+            Cl_Util.Log('', LOG_Error, CVarName.." is not a String");
+        Av_SCVar Result=Av_SCVar(Av_Stream.Create(Type));
+        Result.Data=Data;
+        return Result;
+    }
+
+    /////////////
+    // Reading //
+    /////////////
+
+    override
+    String Read(){
+        if(End())
+            Error("Reached end of stream");
+        Skip(1);
+        return Data.GetString().CharAt(Index-1);
+    }
+
+    override
+    int ReadChar(){
+        if(End())
+            Error("Reached end of stream");
+        Skip(1);
+        return Data.GetString().CharCodeAt(Index-1);
+    }
+
+    override
+    String Peek()
+    {return Data.GetString().CharAt(Index);}
+
+    override
+    int PeekChar()
+    {return Data.GetString().CharCodeAt(Index);}
+
+    override
+    uint Length()
+    {return Data.GetString().Length();}
+
+    /////////////
+    // Writing //
+    /////////////
+
+    override
+    void Write(String Data)
+    {self.Data.SetString(Data);}
+
+    override
+    void Append(String Data)
+    {self.Data.SetString(self.Data.GetString()..Data);}
+}

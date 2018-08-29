@@ -1,0 +1,5 @@
+class Av_FArcCosine:Av_FBase{
+    override
+    double Apply(double X) const
+    {return ACos(super.Apply(X));}
+}

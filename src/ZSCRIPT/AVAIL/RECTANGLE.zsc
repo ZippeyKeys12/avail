@@ -1,0 +1,49 @@
+// TODO: Rename to ZAABB if non-axis aligned rectangles are needed
+class Av_Rectangle{
+    Vector2 Pos,
+            Size;
+
+    static
+    Av_Rectangle Create(Vector2 Pos, Vector2 Size){
+        Av_Rectangle Result=new('Av_Rectangle');
+        Result.Pos=Pos;
+        Result.Size=Size;
+        return Result;
+    }
+
+    static
+    Av_Rectangle FromCorners(Vector2 TL, Vector2 BR)
+    {return Create(TL, (TL.X-BR.X, TL.Y-BR.Y));}
+
+    double Height()
+    {return Size.Y;}
+
+    double Width()
+    {return Size.X;}
+
+    Vector2 Corner(Name Corner){
+        switch(Corner){
+            case 'Top-Left':        return Pos;
+            case 'Top-Right':       return Pos+(Size.X, 0);
+            case 'Bottom-Right':    return Pos+Size;
+            case 'Bottom-Left':     return Pos+(0, Size.Y);
+            default:                return (-1, -1);
+        }
+    }
+
+    double Side(Name Side){
+        switch(Side){
+            case 'Left':    return Pos.X;
+            case 'Top':     return Pos.Y;
+            case 'Right':   return Pos.X+Size.X;
+            case 'Bottom':  return Pos.Y+Size.Y;
+            default:        return 0;
+        }
+    }
+
+    bool IsInRectangle(Vector2 Point)
+    {return Side('Left')<Point.X && Point.X<Side('Right') && Side('Top')<Point.Y && Point.Y<Side('Bottom');}
+
+    Av_Rectangle Clone()
+    {return Create(Pos, Size);}
+}

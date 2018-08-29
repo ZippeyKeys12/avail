@@ -1,0 +1,25 @@
+class Av_FILinear:Av_FInterpolator{}
+
+class Av_FInterpolator:Av_FBase{
+    Av_FBase Start,
+            End;
+    static
+    Av_FInterpolator Create(Name Type, Av_FBase Start, Av_FBase End){
+        Av_FInterpolator Result=Av_FInterpolator(Av_FBase.Create('I'..Type));
+        Result.Start=Start;
+        Result.End=End;
+        return Result;
+    }
+
+    override
+    double Apply(double X) const
+    {return (1-super.Apply(X))*Start.Apply(super.Apply(X))+super.Apply(X)*End.Apply(super.Apply(X));}
+
+    override
+    Av_FBase Clone() const{
+        Av_FInterpolator Result=Av_FInterpolator(super.Clone());
+        Result.Start=Start;
+        Result.End=End;
+        return Result;
+    }
+}

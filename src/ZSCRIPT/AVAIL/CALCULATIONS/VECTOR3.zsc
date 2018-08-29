@@ -1,0 +1,27 @@
+class Av_Calc_V3:Av_Singleton{
+    static
+    Vector3 Midpoint(Vector3 P1, Vector3 P2)
+    {return (P1+P2)/2;}
+
+    static
+    Vector3 Lerp(double Time, Vector3 Start, Vector3 End){
+        Time=Clamp(Time, 0, 1);
+        return (1-Time)*Start+Time*End;
+    }
+
+    static
+    Vector3 SmoothStart(double Time, Vector3 Start, Vector3 End, double Degree=2)
+    {return Clamp(Time, 0, 1)**Degree*(End-Start)+Start;}
+
+    static
+    Vector3 SmoothStop(double Time, Vector3 Start, Vector3 End, double Degree=2)
+    {return (1-(1-Clamp(Time, 0, 1))**Degree)*(End-Start)+Start;}
+
+    static
+    Vector3 SmoothStep(double Time, Vector3 Start, Vector3 End, double Degree=2)
+    {return Lerp(Time, SmoothStart(Time, Start, End, Degree), SmoothStop(Time, Start, End, Degree));}
+
+    static
+    Vector3 CenterOfMass(Vector3 A, Vector3 B, Vector3 C, double AWeight=1, double BWeight=1, double CWeight=1)
+    {return (A*AWeight+B*BWeight+C*CWeight)/(AWeight+BWeight+CWeight);}
+}

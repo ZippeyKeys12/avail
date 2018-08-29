@@ -1,0 +1,33 @@
+class Av_FBezier:Av_FBase{
+    Av_Vector Points;
+
+    Array<Av_FBernstein> Bernsteins;
+
+    static
+    Av_FBezier Create(Av_Vector Points){
+        Av_FBezier Result=Av_FBezier(Av_FBase.Create('Bezier'));
+        Result.Points=Points.Clone();
+        uint Size=Points.Size();
+        for(int I=0; I<Size; I++)
+            Result.Bernsteins.Push(Av_FBernstein.Create(Size, I));
+        return Result;
+    }
+
+    override
+    double Apply(double X){
+        int Total=0;
+        for(int i=0; i<Points.Size(); i++)
+            Total+=Bernsteins[i].Apply(X)*Points.Get(i);
+        return Total;
+    }
+
+    override
+    Av_FBase Clone() const{
+        Av_FBezier Result=Av_FBezier(super.Clone());
+        Result.Points=Points.Clone();
+        uint Size=Points.Size();
+        for(int I=0; I<Size; I++)
+            Result.Bernsteins.Push(Av_FBernstein.Create(Size, I));
+        return Result;
+    }
+}

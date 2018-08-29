@@ -1,0 +1,30 @@
+class Av_Registry{
+    private
+    Array<Av_RegistryItem> RegistryItems;
+
+    Av_Registry Init(){
+        return self;
+    }
+
+    bool Add(Av_RegistryItem RegistryItem){
+        if(!RegistryItem || Get(RegistryItem.ID))return false;
+        RegistryItems.Push(RegistryItem);
+        return true;
+    }
+
+    Av_RegistryItem Get(Name ID) const{
+        for(int i=0; i<RegistryItems.Size(); i++)
+            if(Av_RegistryItem(RegistryItems[i]).ID==ID)
+                return Av_RegistryItem(RegistryItems[i]);
+        return null;
+    }
+
+    Av_RegistryItem GetRand() const
+    {return RegistryItems.Size()==0?null:Av_RegistryItem(RegistryItems[random(0, RegistryItems.Size()-1)]);}
+}
+
+class Av_RegistryItem{
+    Name ID;
+
+    String Name;
+}

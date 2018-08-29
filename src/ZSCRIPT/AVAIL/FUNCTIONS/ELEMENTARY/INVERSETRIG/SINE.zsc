@@ -1,0 +1,5 @@
+class Av_FArcSine:Av_FBase{
+    override
+    double Apply(double X) const
+    {return ASin(super.Apply(X));}
+}

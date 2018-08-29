@@ -1,0 +1,12 @@
+class Av_FLogarithm:Av_FBase{
+    override
+    Av_FBase Init(){
+        if(!Misc)
+            Misc=Av_Util.E;
+        return self;
+    }
+
+    override
+    double Apply(double X) const
+    {return Log(super.Apply(X))/Log(Misc);}
+}

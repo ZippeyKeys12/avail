@@ -1,0 +1,20 @@
+class Av_FOperator:Av_FBase abstract{
+    Av_FBase Main,
+            Operand;
+
+    static
+    Av_FOperator Create(Name Type, Av_FBase Main, Av_FBase Operand){
+        Av_FOperator Result=Av_FOperator(Av_FBase.Create('O'..Type));
+        Result.Main=Main;
+        Result.Operand=Operand;
+        return Result;
+    }
+
+    override
+    Av_FBase Clone() const{
+        Av_FOperator Result=Av_FOperator(super.Clone());
+        Result.Main=Main.Clone();
+        Result.Operand=Operand.Clone();
+        return Result;
+    }
+}

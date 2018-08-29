@@ -1,0 +1,17 @@
+class Av_C_Caesar:Av_Cipher{
+    override
+    String Encrypt(String Str){
+        String Result="";
+        for(int i=0; i<Str.Length(); i++)
+            Result=Result..Av_String.CharacterAt((Av_String.IndexOf(Str, i)+Key.ToInt())%26);
+        return Result;
+    }
+
+    override
+    String Decrypt(String Str){
+        String Result="";
+        for(int i=0; i<Str.Length(); i++)
+            Result=Result..Av_String.CharacterAt((Av_String.IndexOf(Str, i)+Key.ToInt())%26);
+        return Result;
+    }
+}

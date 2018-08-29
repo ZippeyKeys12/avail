@@ -1,0 +1,55 @@
+class Av_SString:Av_Stream{
+    protected
+    String Data;
+
+    static
+    Av_SString Create(String Data, Name Type='String'){
+        Av_SString Result=Av_SString(Av_Stream.Create(Type));
+        Result.Data=Data;
+        return Result;
+    }
+
+    /////////////
+    // Reading //
+    /////////////
+
+    override
+    String Read(){
+        if(End())
+            Error("Reached end of stream");
+        Skip(1);
+        return Data.CharAt(Index-1);
+    }
+
+    override
+    int ReadChar(){
+        if(End())
+            Error("Reached end of stream");
+        Skip(1);
+        return Data.CharCodeAt(Index-1);
+    }
+
+    override
+    String Peek()
+    {return Data.CharAt(Index);}
+
+    override
+    int PeekChar()
+    {return Data.CharCodeAt(Index);}
+
+    override
+    uint Length()
+    {return Data.Length();}
+
+    /////////////
+    // Writing //
+    /////////////
+
+    override
+    void Write(String Data)
+    {self.Data=Data;}
+
+    override
+    void Append(String Data)
+    {self.Data=self.Data..Data;}
+}

@@ -1,0 +1,145 @@
+class Av_Matrix3:Av_Object{
+    private
+    uint __Height__,
+         __Width__,
+         __Depth__;
+
+    Array<double> Values;
+
+    static
+    Av_Matrix3 Create(uint Height, uint Width, uint Depth, bool Ones=false){
+        Av_Matrix3 Result=new('Av_Matrix3');
+        if(Height<=0 || Width<=0 || Depth<=0)
+            Result.Fatal("Attempted to create a non-positively-sized matrix");
+        Result.__Height__=Height;
+        Result.__Width__=Width;
+        Result.__Depth__=Depth;
+        for(int i=0; i<Height*Width*Depth; i++)
+            Result.Values.Push(Ones);
+        return Result;
+    }
+
+    static
+    Av_Matrix3 Randomized(uint Height, uint Width, uint Depth, double Floor=-1, double Ceiling=1, int Seed=0)
+    {return Create(Height, Width, Depth, true).Noise(Floor, Ceiling, Seed);}
+
+    //////////
+    // Info //
+    //////////
+
+    virtual
+    double Get(uint Row, uint Column, uint Layer) const
+    {return Values[Row+__Width__*(Column+__Height__*Layer)];}
+
+    ///////////////////
+    // Manipulations //
+    ///////////////////
+
+    virtual
+    void Set(uint Row, uint Column, uint Layer, double Value)
+    {Values[Row+__Width__*(Column+__Height__*Layer)]=Value;}
+
+    virtual
+    Av_Matrix3 Add(Av_Matrix3 Other) const{
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__ || __Depth__!=Other.__Depth__)
+            Fatal("Attempted to add differently-sized matrices");
+        Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]+Other.Values[i];
+        return Result;
+    }
+
+    virtual
+    Av_Matrix3 Sub(Av_Matrix3 Other) const{
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__ || __Depth__!=Other.__Depth__)
+            Fatal("Attempted to subtract differently-sized matrices");
+        Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]-Other.Values[i];
+        return Result;
+    }
+
+    virtual
+    Av_Matrix3 Mul(Av_Matrix3 Other) const{
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__ || __Depth__!=Other.__Depth__)
+            Fatal("Attempted to multiply differently-sized matrices");
+        Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]*Other.Values[i];
+        return Result;
+    }
+
+    virtual
+    Av_Matrix3 Div(Av_Matrix3 Other) const{
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__ || __Depth__!=Other.__Depth__)
+            Fatal("Attempted to divide differently-sized matrices");
+        Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]/Other.Values[i];
+        return Result;
+    }
+
+    virtual
+    Av_Matrix3 Map(Av_FBase Function) const{
+        Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
+        for(int i=0; i<__Height__*__Width__*__Depth__; i++)
+            Result.Values[i]=Function.Apply(Values[i]);
+        return Result;
+    }
+
+    virtual
+    Av_Matrix3 SMul(double Multiplier) const{
+        Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]*Multiplier;
+        return Result;
+    }
+
+    virtual
+    Av_Matrix3 SDiv(double Divisor) const{
+        Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]/Divisor;
+        return Result;
+    }
+
+    virtual
+    Av_Matrix3 SExponent(double Degree){
+        Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]**Degree;
+        return Result;
+    }
+
+    virtual
+    Av_Matrix3 Noise(double Floor, double Ceiling, int Seed=0) const{
+        if(!Seed)
+            Seed=Av_Util.RandSeed();
+        SetRandomSeed[NoiseyBoi](Seed);
+        Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
+        for(int Index=0; Index<Values.Size(); Index++)
+            Result.Values[Index]=Values[Index]*FRandom[NoiseyBoi](Floor, Ceiling);
+        return Result;
+    }
+
+    ////////////////
+    // Transforms //
+    ////////////////
+
+    // TODO: Fix
+    // virtual
+    // Av_Matrix2_G ToSM2(){
+    //     if(__Depth__!=2)
+    //         Fatal("Attempted to convert Av_Matrix3 to Av_Matrix2_G: Is not 2 deep");
+    //     Av_Matrix2_G Result=Av_Matrix2_G.Create(__Height__, __Width__);
+    //     Result.Values.Copy(Values);
+    //     return Result;
+    // }
+
+    virtual
+    Av_Matrix3 Clone() const{
+        Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
+        Result.Values.Copy(Values);
+        return Result;
+    }
+}

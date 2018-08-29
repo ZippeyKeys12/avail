@@ -1,0 +1,117 @@
+extend
+class Av_Matrix2{
+    static
+    Av_Matrix2 Null_3D()
+    {return Create(4, 4);}
+
+    static
+    Av_Matrix2 Identity_3D()
+    {return Identity(4);}
+
+    static
+    Av_Matrix2 Pure_3D(){
+        Av_Matrix2 Result=Identity_3D();
+        Result.Swap(3, 2, 3, 3);
+        return Result;
+    }
+
+    static
+    Av_Matrix2 Translate_3D(Vector3 Displacement){
+        Av_Matrix2 Result=Identity_3D();
+        Result.Set(0, 3, Displacement.X);
+        Result.Set(1, 3, Displacement.Y);
+        Result.Set(2, 3, Displacement.Z);
+        return Result;
+    }
+
+    static
+    Av_Matrix2 Scale_3D(Vector3 Scale){
+        Av_Matrix2 Result=Identity_3D();
+        Result.Set(0, 0, Scale.X);
+        Result.Set(1, 1, Scale.Y);
+        Result.Set(2, 2, Scale.Z);
+        return Result;
+    }
+
+    static
+    Av_Matrix2 Rotate_3D(double Angle, Vector3 Axis){
+        Av_Matrix2 Result=Identity_3D();
+        double C=Cos(Angle),
+               MinC=1-C,
+               XY=Axis.X*Axis.Y,
+               XZ=Axis.X*Axis.Z,
+               YZ=Axis.Y*Axis.Z;
+        Vector3 SAxis=Axis*Sin(Angle);
+        Result.Set(0, 0, MinC*Axis.X**2+C);
+        Result.Set(0, 1, MinC*XY-SAxis.Z);
+        Result.Set(0, 2, MinC*XZ+SAxis.Y);
+        Result.Set(1, 0, MinC*XY+SAxis.Z);
+        Result.Set(1, 1, MinC*Axis.Y**2+C);
+        Result.Set(1, 2, MinC*YZ-SAxis.X);
+        Result.Set(2, 0, MinC*XZ-SAxis.Y);
+        Result.Set(2, 1, MinC*YZ+SAxis.X);
+        Result.Set(2, 2, MinC*Axis.Z**2+C);
+        return Result;
+    }
+
+    static
+    Av_Matrix2 SwapYZ(){
+        Av_Matrix2 Result=Null_3D();
+        Result.Set(0, 0,  1);
+        Result.Set(1, 2,  1);
+        Result.Set(2, 1, -1);
+        Result.Set(3, 3,  1);
+        return Result;
+    }
+
+    static
+    Av_Matrix2 Perspective(double FoVV, double Aspect, double Z_Near, double Z_Far){
+        double F=1/Tan(FoVV/2);
+        Av_Matrix2 Result=Null_3D();
+        Result.Set(0, 0, F/Aspect);
+        Result.Set(1, 1, F);
+        Result.Set(2, 2, (Z_Far+Z_Near)/double(Z_Near-Z_Far));
+        Result.Set(2, 3, (2*Z_Far*Z_Near)/double(Z_Near-Z_Far));
+        Result.Set(3, 2, -1);
+        return Result;
+    }
+
+    static
+    Av_Matrix2 WorldToView(Vector3 Pos, double Yaw, double Pitch, double Roll){
+        Vector2 Ang=(Cos(Pitch), Sin(Pitch)*Level.PixelStretch);
+        double AdjPitch=ASin(Ang.Y/Ang.Length()),
+               AdjYaw=Yaw-90;
+        Av_Matrix2 Result=Rotate_3D(Roll, (0, 0, 1))
+                       .M2Mul(Rotate_3D(AdjPitch, (1, 0, 0)))
+                       .M2Mul(Rotate_3D(AdjYaw, (0, -1, 0)))
+                       .M2Mul(Scale_3D((1, Level.PixelStretch, 1)))
+                       .M2Mul(SwapYZ())
+                       .M2Mul(Translate_3D(-Pos));
+        return Result;
+    }
+
+    static
+    Av_Matrix2 WorldToClip(Vector3 Pos, double Yaw, double Pitch, double Roll, double FoV)
+    {return WorldToView(Pos, Yaw, Pitch, Roll).ToClip(FoV);}
+
+    Av_Matrix2 ToClip(double FoV){
+        return Perspective(Av_Screen.FoVV(FoV), Av_Screen.AspectRatio(), 5, 65535)
+              .M2Mul(self);
+    }
+
+    enum Av_EHomogeneousCoord{
+        HM_DIRECTION,
+        HM_POSITION,
+    }
+
+    Av_Vector Transform_3D(Vector3 Vec, double W=HM_POSITION){
+        Av_Vector Vector=Av_Vector.Create(4);
+        Vector.Set(0, Vec.X);
+        Vector.Set(1, Vec.Y);
+        Vector.Set(2, Vec.Z);
+        if(W<HM_DIRECTION || HM_POSITION<W)
+            Fatal("Invalid homogeneous coordinate: "..W);
+        Vector.Set(3, W);
+        return VMul(Vector);
+    }
+}

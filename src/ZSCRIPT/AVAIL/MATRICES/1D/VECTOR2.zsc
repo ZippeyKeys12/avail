@@ -1,0 +1,85 @@
+class Av_Vector_V2{
+    private
+    uint __Length__;
+
+    Array<double> Values;
+
+    static
+    Av_Vector_V2 Create(uint Length){
+        Av_Vector_V2 Result=new('Av_Vector_V2');
+        Result.__Length__=Length;
+        for(int i=0; i<2*Length; i++)
+            Result.Values.Push(0);
+        return Result;
+    }
+
+    //////////
+    // Info //
+    //////////
+
+    Vector2 Get(uint Index) const
+    {return (Values[2*Index], Values[2*Index+1]);}
+
+    Vector2 ASum() const{
+        Vector2 Total=(0,0);
+        for(int i=0; i<__Length__; i++)
+            Total+=Get(i);
+        return Total;
+    }
+
+    Vector2 AMin() const{
+        Vector2 Min=Get(0);
+        for(int i=1; i<__Length__; i++)
+            if(Get(i).Length()<Min.Length())
+                Min=Get(i);
+        return Min;
+    }
+
+    Vector2 AMax() const{
+        Vector2 Max=Get(0);
+        for(int i=1; i<__Length__; i++)
+            if(Max.Length()<Get(i).Length())
+                Max=Get(i);
+        return Max;
+    }
+
+    Vector2 ARange() const
+    {return AMax()-AMin();}
+
+    Vector2 AMean() const
+    {return ASum()/__Length__;}
+
+    ///////////////////
+    // Manipulations //
+    ///////////////////
+
+    void Set(uint Index, Vector2 Value){
+        Values[2*Index]  =Value.X;
+        Values[2*Index+1]=Value.Y;
+    }
+
+    virtual
+    Av_Vector_V2 Map(Av_FBase Function) const{
+        Av_Vector_V2 Result=Create(__Length__);
+        for(int i=0; i<__Length__; i++)
+            Result.Values[i]=Function.Apply(Values[i]);
+        return Result;
+    }
+
+    /////////////////////
+    // Transformations //
+    /////////////////////
+
+    Av_Vector ToV(){
+        Av_Vector Result=Av_Vector.Create(__Length__);
+        for(int i=0; i<__Length__; i++)
+            Result.Values[i]=Get(i).Length();
+        return Result;
+    }
+
+    Av_Vector_V2 Clone() const{
+        Av_Vector_V2 Result=Create(__Length__);
+        Result.Values.Copy(Values);
+        return Result;
+    }
+}

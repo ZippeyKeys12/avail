@@ -1,0 +1,19 @@
+class Av_Calc_Q:Av_Singleton{
+    static
+    Av_Quaternion Lerp(double Time, Av_Quaternion Start, Av_Quaternion End)
+    {return Start.SMul(1-Time).Add(End.SMul(Time)).Unit();}
+
+    static
+    Av_Quaternion Slerp(double Time, Av_Quaternion Start, Av_Quaternion End){
+        double SEDot=Start.DotProduct(End);
+        Av_Quaternion Temp;
+        if(SEDot<0){
+            SEDot=-SEDot;
+            Temp=End.Negative();
+        }else Temp=End;
+        if(SEDot<.95){
+            double Angle=ACos(SEDot);
+            return Start.SMul(Sin(Angle*(1-Time))).Add(Temp.SMul(Sin(Angle*Time))).SDiv(Sin(Angle));
+        }else return Lerp(Time, Start, Temp);
+    }
+}

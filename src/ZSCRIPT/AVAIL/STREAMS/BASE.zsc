@@ -1,0 +1,95 @@
+class Av_Stream:Av_Object abstract{
+    protected
+    uint Index;
+
+    static
+    Av_Stream Create(Name Type){
+        Type='Av_S'..Type;
+        if(!Av_Util.ChildOf(Type, 'Av_Stream')){
+            Cl_Util.Log(Type, LOG_Fatal, "Class does not exist");
+            return null;
+        }
+        return Av_Stream(new(Type));
+    }
+
+    /////////////
+    // Reading //
+    /////////////
+
+    virtual
+    String Read()
+    {return "";}
+
+    virtual
+    int ReadChar()
+    {return -1;}
+
+    virtual
+    String Peek()
+    {return "";}
+
+    virtual
+    int PeekChar()
+    {return -1;}
+
+    virtual
+    uint Length()
+    {return 0;}
+
+    int ReadByte()
+    {return ReadChar() & 255;}
+
+    int ReadShort()
+    {return ReadByte()<<8 | ReadByte();}
+
+    int ReadInt()
+    {return ReadShort()<<16 | ReadShort();}
+
+    Vector2 ReadByteV2()
+    {return (ReadByte(), ReadByte());}
+
+    Vector2 ReadShortV2()
+    {return (ReadShort(), ReadShort());}
+
+    Vector2 ReadIntV2()
+    {return (ReadInt(), ReadInt());}
+
+    Vector3 ReadByteV3()
+    {return (ReadByte(), ReadByte(), ReadByte());}
+
+    Vector3 ReadShortV3()
+    {return (ReadShort(), ReadShort(), ReadShort());}
+
+    Vector3 ReadIntV3()
+    {return (ReadInt(), ReadInt(), ReadInt());}
+
+    float ReadFloat(){
+        Fatal("ReadFloat not defined yet");
+        return double.NaN;
+    }
+
+    int Skip(int Offset)
+    {return Index+=Offset;}
+
+    uint Position()
+    {return Index;}
+
+    bool End()
+    {return Length()<=Position();}
+
+    void Reset()
+    {Index=0;}
+
+    void Close()
+    {Destroy();}
+
+    /////////////
+    // Writing //
+    /////////////
+
+    virtual
+    void Write(String Data){}
+
+    virtual
+    void Append(String Data){}
+}

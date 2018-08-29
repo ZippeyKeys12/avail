@@ -1,0 +1,50 @@
+enum Av_EVersType{
+    VERS_Release,
+    VERS_RCandidate,
+    VERS_OpenBeta,
+    VERS_ClosedBeta,
+    VERS_OpenAlpha,
+    VERS_ClosedAlpha,
+    VERS_PreAlpha,
+}
+
+class Av_Version{
+    protected
+    int Major,
+        Minor,
+        Patch,
+        Revision;
+
+    protected
+    Av_EVersType Type;
+
+    static
+    Av_Version Create(int Major, int Minor, int Patch, int Revision, Av_EVersType Type){
+        Av_Version Result=new('Av_Version');
+        Result.Major=Major;
+        Result.Minor=Minor;
+        Result.Patch=Patch;
+        Result.Revision=Revision;
+        Result.Type=Type;
+        return Result;
+    }
+
+    String TypeLabel(Av_EVersType Type){
+        switch(Type){
+            case VERS_Release: return "[REL]";
+            case VERS_RCandidate: return "[RC][WIP/REL]";
+            case VERS_OpenBeta: return "[BETA][WIP/REL]";
+            case VERS_ClosedBeta: return "[BETA][WIP]";
+            case VERS_OpenAlpha: return "[ALPHA][WIP/REL]";
+            case VERS_ClosedAlpha: return "[ALPHA][WIP]";
+            case VERS_PreAlpha: return "[WIP]";
+            default: return "";
+        }
+    }
+
+    Av_Version Diff(Av_Version Other)
+    {return Create(Abs(Major-Other.Major), Abs(Minor-Other.Minor), Abs(Patch-Other.Patch), 0, Max(Type, Other.Type));}
+
+    String ToString()
+    {return Major.."."..Minor.."."..Patch.."."..Revision.." "..TypeLabel(Type);}
+}

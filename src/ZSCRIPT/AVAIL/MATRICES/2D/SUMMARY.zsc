@@ -1,0 +1,91 @@
+class Av_Matrix2_G:Av_Object{
+    private
+    uint __Height__,
+         __Width__;
+
+    Array<Av_Gaussian> Values;
+
+    static
+    Av_Matrix2_G Create(uint Height, uint Width){
+        Av_Matrix2_G Result=new('Av_Matrix2_G');
+        if(Height<=0 || Width<=0)
+            Result.Fatal("Attempted to create a non-positively-sized summary matrix");
+        Result.__Height__=Height;
+        Result.__Width__=Width;
+        for(int i=0; i<Height*Width; i++)
+            Result.Values.Push(Av_Gaussian.Create(0, 1));
+        return Result;
+    }
+
+    //////////
+    // Info //
+    //////////
+
+    Av_Gaussian Get(uint Row, uint Column) const
+    {return Values[Row*__Width__+Column];}
+
+    double GetMean(uint Row, uint Column)
+    {return Get(Row, Column).Mean();}
+
+    double GetStdDev(uint Row, uint Column)
+    {return Get(Row, Column).StdDev();}
+
+    ///////////////////
+    // Manipulations //
+    ///////////////////
+
+    void Set(uint Row, uint Column, double Mean, double StdDev)
+    {Values[Row*__Width__+Column]=Av_Gaussian.Create(Mean, StdDev);}
+
+    void SetModel(uint Row, uint Column, Av_Gaussian Distribution)
+    {Values[Row*__Width__+Column]=Distribution.Clone();}
+
+    void SetMean(uint Row, uint Column, double Value)
+    {Set(Row, Column, Value, GetStdDev(Row, Column));}
+
+    void SetStdDev(uint Row, uint Column, double Value)
+    {Set(Row, Column, GetMean(Row, Column), Value);}
+
+    Av_Matrix2_G Add(Av_Matrix2_G Other) const{
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__)
+            Fatal("Attempted to add differently-sized matrices");
+        Av_Matrix2_G Result=Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i].Add(Other.Values[i]);
+        return Result;
+    }
+
+    Av_Matrix2_G Sub(Av_Matrix2_G Other) const{
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__)
+            Fatal("Attempted to subtract differently-sized matrices");
+        Av_Matrix2_G Result=Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i].Sub(Other.Values[i]);
+        return Result;
+    }
+
+    Av_Matrix2_G SMul(double Multiplier) const{
+        Av_Matrix2_G Result=Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i].SMul(Multiplier);
+        return Result;
+    }
+
+    Av_Matrix2_G SDiv(double Divisor) const{
+        Av_Matrix2_G Result=Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i].SDiv(Divisor);
+        return Result;
+    }
+
+    ////////////////
+    // Transforms //
+    ////////////////
+
+    virtual
+    Av_Matrix2_G Clone() const{
+        Av_Matrix2_G Result=Create(__Height__, __Width__);
+        Result.Values.Copy(Values);
+        return Result;
+    }
+}

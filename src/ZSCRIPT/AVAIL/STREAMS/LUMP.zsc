@@ -1,0 +1,17 @@
+class Av_SLump:Av_SString{
+    static
+    Av_SLump Create(uint Lump, Name Type='Lump')
+    {return Av_SLump(Av_SString.Create(Wads.ReadLump(Lump), Type));}
+
+    /////////////
+    // Writing //
+    /////////////
+
+    override
+    void Write(String Data)
+    {Fatal("Cannot write to lumps");}
+
+    override
+    void Append(String Data)
+    {Fatal("Cannot write to lumps");}
+}

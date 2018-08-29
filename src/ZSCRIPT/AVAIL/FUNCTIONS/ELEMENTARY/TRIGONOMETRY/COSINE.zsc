@@ -1,0 +1,5 @@
+class Av_FCosine:Av_FBase{
+    override
+    double Apply(double X) const
+    {return Cos(super.Apply(X));}
+}

@@ -1,0 +1,103 @@
+class Av_Gaussian{
+    private
+    bool PreGenerated;
+
+    private
+    int PreGen;
+
+    private
+    double __Mean__,
+           __StdDev__;
+
+    private
+    Array<double> CachedValues;
+
+    static
+    Av_Gaussian Create(double Mean=0, double StdDev=1){
+        Av_Gaussian Result=new('Av_Gaussian');
+        Result.__Mean__=Mean;
+        Result.__StdDev__=StdDev;
+        return Result;
+    }
+
+    void Simulate(int Amount, int Seed=0){
+        for(int i=0; i<Amount; i++)
+            CachedValues.Push(Generate(Seed));
+    }
+
+    double Mean() const
+    {return __Mean__;}
+
+    double StdDev() const
+    {return __StdDev__;}
+
+    double Generate(int Seed=0){
+        if(!Seed)
+            Seed=Av_Util.RandSeed();
+        SetRandomSeed[GauseyBoi](Seed);
+        PreGenerated=!PreGenerated;
+        if(!PreGenerated)
+            return PreGen*__StdDev__+__Mean__;
+        else{
+            double u1, u2;
+            do{
+                u1=FRandom[GauseyBoi](0, 1);
+                u2=FRandom[GauseyBoi](0, 1);
+            }while(u1<=double.epsilon);
+            double Gen=Sqrt(-2*Log(u1))*Cos(360*u2);
+            PreGen=Sqrt(-2*Log(u1))*Sin(360*u2);
+            return Gen*__StdDev__+__Mean__;
+        }
+    }
+
+    double Get(int Index=-1) const
+    {return CachedValues[(Index<0)?Random(0, CachedValues.Size()-1):Index];}
+
+    Av_Gaussian Add(Av_Gaussian Other) const{
+        Av_Gaussian Result=Create(__Mean__-Other.__Mean__, Sqrt(__StdDev__**2+Other.__StdDev__**2));
+        for(int i=0; i<Min(CachedValues.Size(), Other.CachedValues.Size()); i++)
+            Result.CachedValues[i]=CachedValues[Random(0, CachedValues.Size()-1)]+Other.CachedValues[Random(0, Other.CachedValues.Size()-1)];
+        return Result;
+    }
+
+    Av_Gaussian Sub(Av_Gaussian Other) const{
+        Av_Gaussian Result=Create(__Mean__-Other.__Mean__, Sqrt(__StdDev__**2+Other.__StdDev__**2));
+        for(int i=0; i<Min(CachedValues.Size(), Other.CachedValues.Size()); i++)
+            Result.CachedValues[i]=CachedValues[Random(0, CachedValues.Size()-1)]-Other.CachedValues[Random(0, Other.CachedValues.Size()-1)];
+        return Result;
+    }
+
+    Av_Gaussian SMul(double Multiplier) const{
+        Av_Gaussian Result=Create(__Mean__*Multiplier, __StdDev__*Multiplier);
+        for(int i=0; i<CachedValues.Size(); i++)
+            Result.CachedValues[i]=CachedValues[i]*Multiplier;
+        return Result;
+    }
+
+    Av_Gaussian SDiv(double Divisor) const{
+        Av_Gaussian Result=Create(__Mean__/Divisor, __StdDev__/Divisor);
+        for(int i=0; i<CachedValues.Size(); i++)
+            Result.CachedValues[i]=CachedValues[i]/Divisor;
+        return Result;
+    }
+
+    double ZScore(double Value) const
+    {return (Value-__Mean__)/__StdDev__;}
+
+    void Clear()
+    {CachedValues.Clear();}
+
+    Av_Gaussian Clone() const{
+        Av_Gaussian Result=Create(__Mean__, __StdDev__);
+        Result.PreGenerated=PreGenerated;
+        Result.PreGen=PreGen;
+        Result.CachedValues.Copy(CachedValues);
+        return Result;
+    }
+
+    Av_Vector ToV() const{
+        Av_Vector Result=Av_Vector.Create(CachedValues.Size());
+        Result.Values.Copy(CachedValues);
+        return Result;
+    }
+}

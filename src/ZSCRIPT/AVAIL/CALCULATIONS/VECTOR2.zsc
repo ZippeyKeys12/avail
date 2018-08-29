@@ -1,0 +1,47 @@
+class Av_Calc_V2:Av_Singleton{
+    static
+    Vector2 Midpoint(Vector2 P1, Vector2 P2)
+    {return (P1+P2)/2;}
+
+    static
+    Vector2 Lerp(double Time, Vector2 Start=(0, 0), Vector2 End=(1, 1)){
+        Time=Clamp(Time, 0, 1);
+        return (1-Time)*Start+Time*End;
+    }
+
+    static
+    Vector2 SmoothStart(double Time, Vector2 Start=(0, 0), Vector2 End=(1, 1), double Degree=2)
+    {return Clamp(Time, 0, 1)**Degree*(End-Start)+Start;}
+
+    static
+    Vector2 SmoothStop(double Time, Vector2 Start=(0, 0), Vector2 End=(1, 1), double Degree=2)
+    {return (1-(1-Clamp(Time, 0, 1))**Degree)*(End-Start)+Start;}
+
+    static
+    Vector2 SmoothStep(double Time, Vector2 Start=(0, 0), Vector2 End=(1, 1), double Degree=2)
+    {return Lerp(Time, SmoothStart(Time, Start, End, Degree), SmoothStop(Time, Start, End, Degree));}
+
+    static
+    bool IsInTriangle(Vector2 Point, Vector2 A, Vector2 B, Vector2 C){
+        Vector2 C2A=C-A,
+                B2A=B-A,
+                P2A=Point-A;
+        int C2C=C2A dot C2A,
+            C2B=C2A dot B2A,
+            C2P=C2A dot P2A,
+            B2B=B2A dot B2A,
+            B2P=B2A dot P2A,
+            InverseDenominator=1/(C2C*B2B-C2B**2),
+            U=InverseDenominator*(B2B*C2P-C2B*B2P),
+            V=InverseDenominator*(C2C*B2P-C2B*C2P);
+            return U>=0 && V>=0 && U+V<1;
+    }
+
+    static
+    Vector2 CenterOfMass(Vector2 A, Vector2 B, Vector2 C, double AWeight=1, double BWeight=1, double CWeight=1)
+    {return (A*AWeight+B*BWeight+C*CWeight)/(AWeight+BWeight+CWeight);}
+
+    static
+    Vector3 ToV3(Vector2 Point, double Z)
+    {return (Point.X, Point.Y, Z);}
+}

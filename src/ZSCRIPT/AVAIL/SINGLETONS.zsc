@@ -1,0 +1,35 @@
+class Av_Singleton:Av_Object{
+    virtual
+    virtualscope
+    Av_Singleton Init()
+    {return self;}
+}
+
+class Av_Singletons:EventHandler{
+    Array<Av_Singleton> Singletons;
+
+    static
+    clearscope
+    Av_Singletons Instance()
+    {return Av_Singletons(Find('Av_Singletons'));}
+
+    static
+    Av_Singleton Get(Class<Av_Singleton> Type){
+        Av_Singleton Result=DataGet(Type);
+        if(!Result){
+            Result=Av_Singleton(new(Type)).Init();
+            Instance().Singletons.Push(Result);
+        }
+        return Result;
+    }
+
+    static
+    clearscope
+    Av_Singleton DataGet(Class<Av_Singleton> Type){
+        Av_Singletons this=Instance();
+        for(int i=0; i<this.Singletons.Size(); i++)
+            if(this.Singletons[i].GetClassName()==Type)
+                return this.Singletons[i];
+        return null;
+    }
+}

@@ -1,0 +1,32 @@
+class Av_Perlin{
+    private
+    Av_Matrix2 Noise;
+
+    static
+    Av_Perlin Create(uint Height, uint Width, int OctaveCount=8, int Seed=0)
+    {return new('Av_Perlin').Init(Height, Width, OctaveCount, Seed);}
+
+    private
+    Av_Perlin Init(int Height, int Width, int OctaveCount, int Seed){
+        Array<Av_Matrix2> Noises;
+        Av_Matrix2 BaseNoise=Av_Matrix2.Randomized(Height, Width, 0, Seed: Seed);
+        for(int Octave=0; Octave<OctaveCount; Octave++)
+            Noises.Push(BaseNoise.SmoothNoise(Octave));
+        double Amplitude=1,
+               TotalAmplitude=0;
+        Noise=Av_Matrix2.Create(Height, Width);
+        for(int Octave=OctaveCount-1; Octave>=0; Octave--){
+            TotalAmplitude+=Amplitude*=.5;
+            for(int i=0; i<Height; i++)
+                for(int j=0; j<Width; j++)
+                    Noise.Set(i, j, Noise.Get(i, j)+Noises[Octave].Get(i, j));
+        }
+        for(int i=0; i<Height; i++)
+            for(int j=0; j<Width; j++)
+                Noise.Set(i, j, Noise.Get(i, j)/TotalAmplitude);
+        return self;
+    }
+
+    double Get(int Row, int Column)
+    {return Noise.Get(Row, Column);}
+}

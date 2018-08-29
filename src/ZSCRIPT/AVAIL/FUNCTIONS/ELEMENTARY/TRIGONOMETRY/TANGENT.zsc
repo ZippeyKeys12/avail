@@ -1,0 +1,5 @@
+class Av_FTangent:Av_FBase{
+    override
+    double Apply(double X) const
+    {return Tan(super.Apply(X));}
+}
