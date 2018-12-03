@@ -29,7 +29,7 @@ class Av_Matrix3:Av_Object{
 
     virtual
     double Get(uint Row, uint Column, uint Layer) const
-    {return Values[Row+__Width__*(Column+__Height__*Layer)];}
+    {return Values[Column+__Width__*(Row+__Height__*Layer)];}
 
     ///////////////////
     // Manipulations //
@@ -37,7 +37,7 @@ class Av_Matrix3:Av_Object{
 
     virtual
     void Set(uint Row, uint Column, uint Layer, double Value)
-    {Values[Row+__Width__*(Column+__Height__*Layer)]=Value;}
+    {Values[Column+__Width__*(Row+__Height__*Layer)]=Value;}
 
     virtual
     Av_Matrix3 Add(Av_Matrix3 Other) const{
