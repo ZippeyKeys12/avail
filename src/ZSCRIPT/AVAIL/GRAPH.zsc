@@ -1,5 +1,5 @@
 class Av_Graph:Av_Object{
-    Array<Av_Node> Nodes;
+    Array<Av_Node> nodes;
 
     Av_Plan GetPlan(Av_Node StartNode, Av_Node GoalNode){
         uint Index=Nodes.Find(StartNode);
@@ -66,8 +66,11 @@ class Av_Graph:Av_Object{
 class Av_Plan:Av_Object{
     Array<Av_Node> Nodes;
 
-    Av_Node Peek()
-    {return Nodes[Nodes.Size()-1];}
+    Av_Node Peek(uint depth=0){
+        if(Nodes.Size()-depth)
+            return Nodes[Nodes.Size()-depth-1];
+        return null;
+    }
 
     Av_Node Pop(){
         Av_Node Last=Peek();
@@ -87,8 +90,16 @@ class Av_Node:Av_Object abstract{
     {return Av_Node(new(Type));}
 
     virtual
-    double DistanceTo(Av_Node Other)
+    double DistanceTo(Av_Node other)
     {return 0;}
+
+    virtual
+    Av_Edge EdgeTo(Av_Node other){
+        for(let i=0; i<Edges.Size(); i++)
+            if(Edges[i].To==other)
+                return Edges[i];
+        return null;
+    }
 }
 
 class Av_Edge:Av_Object{

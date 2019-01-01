@@ -259,7 +259,7 @@ class Av_Matrix2:Av_Object{
         for(int i=0; i<__Width__; i++)
             result.Set(oRow, i, result.Get(nRow, i));
         for(int i=0; i<__Width__; i++)
-            result.Set(nRow, i, oRowInst.Get(0, i));
+            result.Set(nRow, i, oRowInst.Get(i));
         return result;
     }
 
@@ -270,7 +270,7 @@ class Av_Matrix2:Av_Object{
         for(int i=0; i<__Height__; i++)
             result.Set(i, oColumn, result.Get(nColumn, i));
         for(int i=0; i<__Height__; i++)
-            result.Set(i, nColumn, oColumnInst.Get(i, 0));
+            result.Set(i, nColumn, oColumnInst.Get(i));
         return result;
     }
 
