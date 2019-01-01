@@ -5,15 +5,15 @@ enum Av_EOrientation{
 }
 
 class Av_Polygon{
-    Array<Av_Edge> Edges;
+    Array<Av_Line> Edges;
 }
 
-class Av_Edge{
+class Av_Line{
     Vector2 v1, v2;
 
     static
-    Av_Edge Of(Vector2 v1, Vector2 v2){
-        let result=new('Av_Edge');
+    Av_Line Of(Vector2 v1, Vector2 v2){
+        let result=new('Av_Line');
         result.v1=v1;
         result.v2=v2;
         return result;
@@ -35,7 +35,8 @@ class Av_Edge{
     static
     protected
     int CollinearDeterminant(Vector2 p1, Vector2 p2, Vector2 p3){
-        return ;
+        return (p2.y-p1.y)*(p3.x-p2.x)
+              -(p2.x-p1.x)*(p3.y-p2.y);
     }
 
     static
@@ -50,25 +51,27 @@ class Av_Edge{
     }
 
     bool IsOn(Vector2 p){
-        return (p.x <= max(v1.x, v2.x) && p.x >= min(v1.x, v2.x)
-             && p.y <= max(v1.y, v2.y) && p.y >= min(v1.y, v2.y));
+        return (p.x<=max(v1.x, v2.x) && p.x>=min(v1.x, v2.x)
+             && p.y<=max(v1.y, v2.y) && p.y>=min(v1.y, v2.y));
     }
 
-    bool SegmentIntersect(Av_Edge other){
-        int o1 = Orientation(v1, other.v1, v2       ),
-            o2 = Orientation(v1, other.v1, other.v2 ),
-            o3 = Orientation(v2, other.v2, v1       ),
-            o4 = Orientation(v2, other.v2, other.v1 );
+    bool SegmentIntersect(Av_Line other){
+        let p1=other.v1,
+            p2=other.v2;
+        int o1 = Orientation(v1, p1, v2),
+            o2 = Orientation(v1, p1, p2),
+            o3 = Orientation(v2, p2, v1),
+            o4 = Orientation(v2, p2, p1);
         
         if(o1!=o2 && o3!=o4)
             return true;
         
-        let pq1=Of(p1, q1),
-            pq2=Of(p2, q2);
+        let vp1=Of(v1, p1),
+            vp2=Of(v2, p2);
         
-        return o1==ORI_COLLINEAR && pq1.IsOn(p2)
-            || o2==ORI_COLLINEAR && pq1.IsOn(q2)
-            || o3==ORI_COLLINEAR && pq2.IsOn(p1)
-            || o4==ORI_COLLINEAR && pq2.IsOn(q1);
+        return o1==ORI_COLLINEAR && vp1.IsOn(v2)
+            || o2==ORI_COLLINEAR && vp1.IsOn(p2)
+            || o3==ORI_COLLINEAR && vp2.IsOn(v1)
+            || o4==ORI_COLLINEAR && vp2.IsOn(p1);
     }
 }
