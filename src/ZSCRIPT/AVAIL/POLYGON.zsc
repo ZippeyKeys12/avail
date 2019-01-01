@@ -19,12 +19,18 @@ class Av_Edge{
         return result;
     }
 
-    // 2D only!!!!!
-
     static
-    bool AreCollinear(Vector2 p1, Vector2 p2, Vector2 p3){
-        return !CollinearDeterminant(p1, p2, p3);
+    bool AreCollinear(Av_Vector p1, Av_Vector p2, Av_Vector p3){
+        if(p1.Size()!=p2.Size() || p1.Size()!=p3.Size())
+            return false;
+        let matrix=Av_Matrix2.Create(3, p1.Size());
+        matrix.SetRow(0, p1);
+        matrix.SetRow(1, p2);
+        matrix.SetRow(2, p3);
+        return matrix.Rank()==1;
     }
+
+    // 2D only!!!!!
 
     static
     protected
