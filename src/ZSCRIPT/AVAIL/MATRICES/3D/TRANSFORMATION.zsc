@@ -10,9 +10,7 @@ class Av_Matrix2{
 
     static
     Av_Matrix2 Pure_3D(){
-        Av_Matrix2 Result=Identity_3D();
-        Result.Swap(3, 2, 3, 3);
-        return Result;
+        return Identity_3D().Swap(3, 2, 3, 3);
     }
 
     static
@@ -82,11 +80,11 @@ class Av_Matrix2{
         double AdjPitch=ASin(Ang.Y/Ang.Length()),
                AdjYaw=Yaw-90;
         Av_Matrix2 Result=Rotate_3D(Roll, (0, 0, 1))
-                       .M2Mul(Rotate_3D(AdjPitch, (1, 0, 0)))
-                       .M2Mul(Rotate_3D(AdjYaw, (0, -1, 0)))
-                       .M2Mul(Scale_3D((1, Level.PixelStretch, 1)))
-                       .M2Mul(SwapYZ())
-                       .M2Mul(Translate_3D(-Pos));
+                         .M2Mul(Rotate_3D(AdjPitch, (1, 0, 0)))
+                         .M2Mul(Rotate_3D(AdjYaw, (0, -1, 0)))
+                         .M2Mul(Scale_3D((1, Level.PixelStretch, 1)))
+                         .M2Mul(SwapYZ())
+                         .M2Mul(Translate_3D(-Pos));
         return Result;
     }
 

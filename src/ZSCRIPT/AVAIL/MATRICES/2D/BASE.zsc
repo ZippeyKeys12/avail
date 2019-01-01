@@ -223,17 +223,41 @@ class Av_Matrix2:Av_Object{
     {Values[Row*__Width__+Column]=Value;}
 
     virtual
-    void Swap(uint ORow, uint OColumn, uint NRow, uint NColumn){
-        double Temp=Get(ORow, OColumn);
-        Set(ORow, OColumn, Get(NRow, NColumn));
-        Set(NRow, NColumn, Temp);
+    Av_Matrix2 Swap(uint ORow, uint OColumn, uint NRow, uint NColumn) const{
+        let result=Clone();
+        double Temp=result.Get(ORow, OColumn);
+        result.Set(ORow, OColumn, result.Get(NRow, NColumn));
+        result.Set(NRow, NColumn, Temp);
+        return result;
+    }
+
+    virtual
+    Av_Matrix2 SwapRow(uint oRow, uint nRow) const{
+        let result=Clone();
+        let oRowInst=Row(oRow);
+        for(int i=0; i<__Width__; i++)
+            result.Set(oRow, i, result.Get(nRow, i));
+        for(int i=0; i<__Width__; i++)
+            result.Set(nRow, i, oRowInst.Get(0, i));
+        return result;
+    }
+
+    virtual
+    Av_Matrix2 SwapColumn(uint oColumn, uint nColumn) const{
+        let result=Clone();
+        let oColumnInst=Col(oColumn);
+        for(int i=0; i<__Height__; i++)
+            result.Set(i, oColumn, result.Get(nColumn, i));
+        for(int i=0; i<__Height__; i++)
+            result.Set(i, nColumn, oColumnInst.Get(i, 0));
+        return result;
     }
 
     virtual
     Av_Matrix2 Add(Av_Matrix2 Other) const{
         if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__)
             Fatal("Attempted to add differently-sized matrices");
-        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        let Result=Av_Matrix2.Create(__Height__, __Width__);
         for(int i=0; i<Values.Size(); i++)
             Result.Values[i]=Values[i]+Other.Values[i];
         return Result;
@@ -260,24 +284,6 @@ class Av_Matrix2:Av_Object{
     }
 
     virtual
-    Av_Matrix2 Div(Av_Matrix2 Other){
-        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__)
-            Fatal("Attempted to multiply differently-sized matrices");
-        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
-        for(int i=0; i<Values.Size(); i++)
-            Result.Values[i]=Values[i]/Other.Values[i];
-        return Result;
-    }
-
-    virtual
-    Av_Matrix2 Map(Av_FBase Function) const{
-        Av_Matrix2 Result=Create(__Height__, __Width__);
-        for(int i=0; i<__Height__*__Width__; i++)
-            Result.Values[i]=Function.Apply(Values[i]);
-        return Result;
-    }
-
-    virtual
     Av_Matrix2 SMul(double Multiplier) const{
         Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
         for(int i=0; i<Values.Size(); i++)
@@ -286,18 +292,18 @@ class Av_Matrix2:Av_Object{
     }
 
     virtual
-    Av_Matrix2 SDiv(double Divisor) const{
+    Av_Matrix2 SMulRow(uint row, double multiplier) const{
         Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
-        for(int i=0; i<Values.Size(); i++)
-            Result.Values[i]=Values[i]/Divisor;
+        for(int i=0; i<__Width__; i++)
+            Result.Set(row, i, Get(row, i)*multiplier);
         return Result;
     }
 
     virtual
-    Av_Matrix2 SExponent(double Degree){
+    Av_Matrix2 SMulColumn(uint column, double multiplier) const{
         Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
-        for(int i=0; i<Values.Size(); i++)
-            Result.Values[i]=Values[i]**Degree;
+        for(int i=0; i<__Height__; i++)
+            Result.Set(i, column, Get(i, column)*multiplier);
         return Result;
     }
 
@@ -316,8 +322,51 @@ class Av_Matrix2:Av_Object{
         return Result;
     }
 
+    virtual
     Av_Vector VMul(Av_Vector Other) const
     {return M2Mul(Other.ToM2(__Width__!=Other.Size())).ToV();}
+
+    virtual
+    Av_Matrix2 Div(Av_Matrix2 Other){
+        if(__Height__!=Other.__Height__ || __Width__!=Other.__Width__)
+            Fatal("Attempted to multiply differently-sized matrices");
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]/Other.Values[i];
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 SDiv(double Divisor) const{
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]/Divisor;
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 SDivRow(uint row, double divisor) const{
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<__Width__; i++)
+            Result.Set(row, i, Get(row, i)/divisor);
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 SDivColumn(uint column, double divisor) const{
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<__Height__; i++)
+            Result.Set(i, column, Get(i, column)/divisor);
+        return Result;
+    }
+
+    virtual
+    Av_Matrix2 SExponent(double Degree){
+        Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
+        for(int i=0; i<Values.Size(); i++)
+            Result.Values[i]=Values[i]**Degree;
+        return Result;
+    }
 
     Av_Matrix2 SMin(double Min, double Min2=int.max) const{
         Av_Matrix2 Result=Create(__Height__, __Width__);
@@ -367,6 +416,14 @@ class Av_Matrix2:Av_Object{
         return Result;
     }
 
+    virtual
+    Av_Matrix2 Map(Av_FBase Function) const{
+        Av_Matrix2 Result=Create(__Height__, __Width__);
+        for(int i=0; i<__Height__*__Width__; i++)
+            Result.Values[i]=Function.Apply(Values[i]);
+        return Result;
+    }
+
     Av_Matrix2 Transpose() const{
         Av_Matrix2 Result=Create(__Width__, __Height__);
         for(int Row=0; Row<__Height__; Row++)
@@ -396,6 +453,9 @@ class Av_Matrix2:Av_Object{
         return Result;
     }
 
+    // TODO
+    // Check and Fix if Necessary //
+
     Av_Matrix2 SmoothNoise(int Octave) const{
         Av_Matrix2 Result=Create(__Height__, __Width__);
         int Period=2**Octave;
@@ -411,6 +471,36 @@ class Av_Matrix2:Av_Object{
             }
         }
         return Result;
+    }
+
+    //////// End TODO
+
+    Av_Matrix2 RREF() const{
+        let result=Create(__Height__, __Width__);
+        int i=0,
+            j=0;
+        while(i<__Height__ && j<__Width__){
+            int b=0;
+            while(result.Get(i, j)==0 && i+b<__Height__)
+                if(result.Get(i+b, j)==0)
+                    b++;
+                else
+                    result=result.SwapRow(i, i+b);
+            if(!result.Get(i, j) && j!=__Width__-1)
+                j++;
+            if(result.Get(i, j)!=0)
+                result=result.SDivRow(i, result.Get(i, j));
+            int x=0;
+            while(x<__Height__){
+                if(result.Get(x, j)!=0 && x!=i)
+                    for(int k=0; k<__Width__; k++)
+                        result.Set(x, k, result.Get(x, k)-result.Get(x, j)*result.Get(i, i));
+                x++;
+            }
+            i++;
+            j++;
+        }
+        return result;
     }
 
     /////////////////////
