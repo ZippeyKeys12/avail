@@ -52,8 +52,31 @@ class Av_Vector:Av_Object{
     double LengthSquared() const
     {return VDot(Clone());}
 
-    Av_Vector Midpoint(Av_Vector Other) const
-    {return Add(Other).SDiv(2);}
+    Av_Vector Midpoint(Av_Vector Other) const{
+        return Add(Other).SDiv(2);
+    }
+
+    bool Equals(Av_Vector other) const{
+        if(__Length__!=other.__Length__)
+            return false;
+        for(int i=0; i<__Length__; i++)
+            if(Get(i)!=other.Get(i))
+                return false;
+        return true;
+    }
+
+    bool Align(Av_Vector other) const{
+        let sUnit=Unit(),
+            oUnit=other.Unit();
+        return sUnit.Equals(oUnit) || sUnit.Equals(oUnit.SMul(-1));
+    }
+
+    bool IsZero() const{
+        for(int i=0; i<__Length__; i++)
+            if(Get(i))
+                return false;
+        return true;
+    }
 
     ///////////////////
     // Manipulations //
