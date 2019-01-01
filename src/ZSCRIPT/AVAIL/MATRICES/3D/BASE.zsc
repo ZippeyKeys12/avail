@@ -104,7 +104,7 @@ class Av_Matrix3:Av_Object{
     }
 
     virtual
-    Av_Matrix3 SExponent(double Degree){
+    Av_Matrix3 SPow(double Degree){
         Av_Matrix3 Result=Create(__Height__, __Width__, __Depth__);
         for(int i=0; i<Values.Size(); i++)
             Result.Values[i]=Values[i]**Degree;

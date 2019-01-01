@@ -44,11 +44,11 @@ class Av_Matrix2:Av_Object{
     double Get(uint Row, uint Column) const
     {return Values[Row*__Width__+Column];}
 
-    Av_Matrix2 Row(uint Index) const{
-        Av_Matrix2 Result=Create(1, __Width__);
+    Av_Vector Row(uint Index) const{
+        let result=Av_Vector.Create(__Width__);
         for(int i=0; i<__Width__; i++)
-            Result.Set(0, i, Get(Index, i));
-        return Result;
+            result.Set(i, Get(Index, i));
+        return result;
     }
 
     Av_Matrix2 AsRow() const{
@@ -61,11 +61,11 @@ class Av_Matrix2:Av_Object{
     uint Height() const
     {return __Height__;}
 
-    Av_Matrix2 Col(uint Column) const{
-        Av_Matrix2 Result=Create(__Height__, 1);
+    Av_Vector Col(uint Column) const{
+        let result=Av_Vector.Create(__Height__);
         for(int i=0; i<__Height__; i++)
-            Result.Set(i, 0, Get(i, Column));
-        return Result;
+            result.Set(i, Get(i, Column));
+        return result;
     }
 
     Av_Matrix2 AsCol() const{
@@ -77,6 +77,15 @@ class Av_Matrix2:Av_Object{
 
     uint Width() const
     {return __Width__;}
+
+    uint Rank() const{
+        let temp=RREF();
+        int rank=0;
+        for(int i=0; i<__Height__; i++)
+            if(!temp.Row(i).IsZero())
+                rank++;
+        return rank;
+    }
 
     // All Values
 
@@ -115,7 +124,7 @@ class Av_Matrix2:Av_Object{
     }
 
     double AHMean() const
-    {return Values.Size()/SExponent(-1).ASum();}
+    {return Values.Size()/SPow(-1).ASum();}
 
     double AVariance(bool Statistic=true) const{
         double Total=0,
@@ -212,7 +221,7 @@ class Av_Matrix2:Av_Object{
     }
 
     Av_Vector TStdDev(bool Statistic=true, bool ForRows=false) const
-    {return TVariance(Statistic, ForRows).SExponent(.5);}
+    {return TVariance(Statistic, ForRows).SPow(.5);}
 
     ///////////////////
     // Manipulations //
@@ -221,6 +230,18 @@ class Av_Matrix2:Av_Object{
     virtual
     void Set(uint Row, uint Column, double Value)
     {Values[Row*__Width__+Column]=Value;}
+
+    virtual
+    void SetRow(uint row, Av_Vector values){
+        for(int i=0; i<__Width__; i++)
+            Set(row, i, values.Get(i));
+    }
+
+    virtual
+    void SetCol(uint column, Av_Vector values){
+        for(int i=0; i<__Height__; i++)
+            Set(i, column, values.Get(i));
+    }
 
     virtual
     Av_Matrix2 Swap(uint ORow, uint OColumn, uint NRow, uint NColumn) const{
@@ -243,7 +264,7 @@ class Av_Matrix2:Av_Object{
     }
 
     virtual
-    Av_Matrix2 SwapColumn(uint oColumn, uint nColumn) const{
+    Av_Matrix2 SwapCol(uint oColumn, uint nColumn) const{
         let result=Clone();
         let oColumnInst=Col(oColumn);
         for(int i=0; i<__Height__; i++)
@@ -300,7 +321,7 @@ class Av_Matrix2:Av_Object{
     }
 
     virtual
-    Av_Matrix2 SMulColumn(uint column, double multiplier) const{
+    Av_Matrix2 SMulCol(uint column, double multiplier) const{
         Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
         for(int i=0; i<__Height__; i++)
             Result.Set(i, column, Get(i, column)*multiplier);
@@ -353,7 +374,7 @@ class Av_Matrix2:Av_Object{
     }
 
     virtual
-    Av_Matrix2 SDivColumn(uint column, double divisor) const{
+    Av_Matrix2 SDivCol(uint column, double divisor) const{
         Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
         for(int i=0; i<__Height__; i++)
             Result.Set(i, column, Get(i, column)/divisor);
@@ -361,7 +382,7 @@ class Av_Matrix2:Av_Object{
     }
 
     virtual
-    Av_Matrix2 SExponent(double Degree){
+    Av_Matrix2 SPow(double Degree){
         Av_Matrix2 Result=Av_Matrix2.Create(__Height__, __Width__);
         for(int i=0; i<Values.Size(); i++)
             Result.Values[i]=Values[i]**Degree;

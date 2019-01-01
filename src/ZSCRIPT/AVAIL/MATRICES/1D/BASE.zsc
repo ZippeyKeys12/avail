@@ -144,7 +144,7 @@ class Av_Vector:Av_Object{
         return Result;
     }
 
-    Av_Vector SExponent(double Degree){
+    Av_Vector SPow(double Degree){
         Av_Vector Result=Av_Vector.Create(__Length__);
         for(int i=0; i<Values.Size(); i++)
             Result.Values[i]=Values[i]**Degree;
@@ -169,6 +169,54 @@ class Av_Vector:Av_Object{
             Result.Values[i]=Clamp(Values[i], Min, Max);
         return Result;
     }
+
+    double ASum() const{
+        double Total=0;
+        for(int i=0; i<Values.Size(); i++)
+            Total+=Values[i];
+        return Total;
+    }
+
+    double AMin() const{
+        double Min=Values[0];
+        for(int i=1; i<Values.Size(); i++)
+            Min=Min(Min, Values[i]);
+        return Min;
+    }
+
+    double AMax() const{
+        double Max=Values[0];
+        for(int i=1; i<Values.Size(); i++)
+            Max=Max(Max, Values[i]);
+        return Max;
+    }
+
+    double ARange() const
+    {return AMax()-AMin();}
+
+    double AAMean() const
+    {return ASum()/Values.Size();}
+
+    double AGMean() const{
+        double Total=1;
+        for(int i=0; i<Values.Size(); i++)
+            Total*=Values[i];
+        return Total**(1./Values.Size());
+    }
+
+    double AHMean() const
+    {return Values.Size()/SPow(-1).ASum();}
+
+    double AVariance(bool Statistic=true) const{
+        double Total=0,
+               Mean=AAMean();
+        for(int i=0; i<Values.Size(); i++)
+            Total+=(Values[i]-Mean)**2;
+        return Total/(Values.Size()-Statistic);
+    }
+
+    double AStdDev(bool Statistic=true) const
+    {return Sqrt(AVariance());}
 
     Av_Vector Noise(double Floor, double Ceiling, int Seed=0) const{
         if(!Seed)
