@@ -8,7 +8,6 @@
 #include "ZSCRIPT/AVAIL/LEFTINTERPOLATOR.zsc"
 #include "ZSCRIPT/AVAIL/MAPPER.zsc"
 #include "ZSCRIPT/AVAIL/PERLIN.zsc"
-#include "ZSCRIPT/AVAIL/POLYGON.zsc"
 #include "ZSCRIPT/AVAIL/QUATERNION.zsc"
 #include "ZSCRIPT/AVAIL/RECTANGLE.zsc"
 #include "ZSCRIPT/AVAIL/REGISTRIES.zsc"
@@ -88,3 +87,10 @@
 #include "ZSCRIPT/AVAIL/STREAMS/FILE.zsc"
 #include "ZSCRIPT/AVAIL/STREAMS/LUMP.zsc"
 #include "ZSCRIPT/AVAIL/STREAMS/STRING.zsc"
+
+////////////
+// Shapes //
+////////////
+#include "ZSCRIPT/AVAIL/SHAPES/LINE.zsc"
+#include "ZSCRIPT/AVAIL/SHAPES/POINT.zsc"
+#include "ZSCRIPT/AVAIL/SHAPES/POLYGON.zsc"

@@ -1,0 +1,42 @@
+class Av_Point{
+    double x, y;
+
+    Vector2 p;
+
+    static
+    Av_Point Of(double x, double y){
+        return OfV((x, y));
+    }
+
+    static
+    Av_Point OfV(Vector2 p){
+        let result=new('Av_Point');
+        result.p=p;
+        result.x=p.x;
+        result.y=p.y;
+        return result;
+    }
+
+    static
+    bool AreCollinear(Av_Point p1, Av_Point p2, Av_Point p3){
+        return !CollinearDeterminant(p1, p2, p3);
+    }
+
+    static
+    protected
+    int CollinearDeterminant(Av_Point p1, Av_Point p2, Av_Point p3){
+        return (p2.y-p1.y)*(p3.x-p2.x)
+              -(p2.x-p1.x)*(p3.y-p2.y);
+    }
+
+    static
+    Av_EOrientation Orientation(Av_Point p1, Av_Point p2, Av_Point p3){
+        let d=CollinearDeterminant(p1, p2, p3);
+        if(!d)
+            return ORI_COLLINEAR;
+        else if(d>0)
+            return ORI_CLOCKWISE;
+        else
+            return ORI_COUNTERCLOCKWISE;
+    }
+}

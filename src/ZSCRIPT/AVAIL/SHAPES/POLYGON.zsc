@@ -1,0 +1,9 @@
+enum Av_EOrientation{
+    ORI_COLLINEAR,
+    ORI_CLOCKWISE,
+    ORI_COUNTERCLOCKWISE,
+}
+
+class Av_Polygon{
+    Array<Av_Point> Points;
+}

@@ -1,0 +1,45 @@
+class Av_Line{
+    Av_Point v1, v2;
+
+    static
+    Av_Line Of(Av_Point v1, Av_Point v2){
+        let result=new('Av_Line');
+        result.v1=v1;
+        result.v2=v2;
+        return result;
+    }
+
+    static
+    Av_Line OfV(Vector2 v1, Vector2 v2){
+        return Of(Av_Point.OfV(v1), Av_Point.OfV(v2));
+    }
+
+    bool IsOn(Av_Point p){
+        return IsOnV(p.p);
+    }
+
+    bool IsOnV(Vector2 p){
+        return (p.x<=max(v1.x, v2.x) && p.x>=min(v1.x, v2.x)
+             && p.y<=max(v1.y, v2.y) && p.y>=min(v1.y, v2.y));
+    }
+
+    bool SegmentIntersect(Av_Line other){
+        let p1=other.v1,
+            p2=other.v2;
+        int o1 = Av_Point.Orientation(v1, p1, v2),
+            o2 = Av_Point.Orientation(v1, p1, p2),
+            o3 = Av_Point.Orientation(v2, p2, v1),
+            o4 = Av_Point.Orientation(v2, p2, p1);
+        
+        if(o1!=o2 && o3!=o4)
+            return true;
+        
+        let vp1=Of(v1, p1),
+            vp2=Of(v2, p2);
+        
+        return o1==ORI_COLLINEAR && vp1.IsOn(v2)
+            || o2==ORI_COLLINEAR && vp1.IsOn(p2)
+            || o3==ORI_COLLINEAR && vp2.IsOn(v1)
+            || o4==ORI_COLLINEAR && vp2.IsOn(p1);
+    }
+}
