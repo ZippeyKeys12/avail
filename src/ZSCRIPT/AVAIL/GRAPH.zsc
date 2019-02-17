@@ -5,21 +5,28 @@ class Av_Graph:Av_Object{
         uint Index=Nodes.Find(StartNode);
         if(Index==Nodes.Size() || Nodes.Find(GoalNode)==Nodes.Size())
             Fatal("Node doesn't exist");
+
         Array<Av_Node> Open,
                      Closed,
                      CameFrom;
+
         Open.Push(StartNode);
         CameFrom.Resize(Nodes.Size());
+
         Array<double> GCosts,
                       FCosts;
+
         for(int i=0; i<Nodes.Size(); i++)
             GCosts.Push(double.MAX);
         GCosts[Index]=0;
+
         for(int i=0; i<Nodes.Size(); i++)
             FCosts.Push(double.MAX);
         FCosts[Index]=StartNode.DistanceTo(GoalNode);
+
         while(Open.Size()>0){
             Av_Node CurrentNode=Open[Open.Size()-1];
+
             if(CurrentNode==GoalNode){
                 Av_Plan Plan=new('Av_Plan');
                 while(CurrentNode){
@@ -28,38 +35,45 @@ class Av_Graph:Av_Object{
                 }
                 return Plan;
             }
+
             Open.Pop();
             Closed.Push(CurrentNode);
+
             Index=Nodes.Find(CurrentNode);
             for(int i=0; i<CurrentNode.Edges.Size(); i++){
                 Av_Edge CurrentEdge=CurrentNode.Edges[i];
                 Av_Node NextNode=CurrentEdge.To;
                 if(Closed.Find(NextNode)!=Closed.Size() || Nodes.Find(NextNode)==Nodes.Size())
                     continue;
+
                 if(Open.Find(NextNode)==Open.Size())
                     Open.Push(NextNode);
+
                 uint NextIndex=Nodes.Find(NextNode);
                 double GCost=GCosts[Index]+CurrentEdge.Cost;
-                if(GCost>=GCosts[NextIndex])
-                    continue;
-                CameFrom[NextIndex]=CurrentNode;
-                GCosts[NextIndex]=GCost;
-                FCosts[NextIndex]=GCost+NextNode.DistanceTo(GoalNode);
-            }
-            for(int i=0; i<Open.Size(); i++){
-                uint IndexOfMax=i;
-                for(int j=i+1; j<Open.Size(); j++){
-                    if(FCosts[Nodes.Find(Open[j])]>FCosts[Nodes.Find(Open[IndexOfMax])])
-                        IndexOfMax=j;
-                }
-                if(IndexOfMax!=i){
-                    Av_Node Temp=Open[i];
-                    Open[i]=Open[IndexOfMax];
-                    Open[IndexOfMax]=Temp;
+
+                if(GCost<GCosts[NextIndex]){
+                    CameFrom[NextIndex]=CurrentNode;
+                    GCosts[NextIndex]=GCost;
+                    FCosts[NextIndex]=GCost+NextNode.DistanceTo(GoalNode);
                 }
             }
+
+            // TODO: Figure out what this does, not sure why there's a sort
+            // for(int i=0; i<Open.Size(); i++){
+            //     uint IndexOfMax=i;
+            //     for(int j=i+1; j<Open.Size(); j++){
+            //         if(FCosts[Nodes.Find(Open[j])]>FCosts[Nodes.Find(Open[IndexOfMax])])
+            //             IndexOfMax=j;
+            //     }
+            //     if(IndexOfMax!=i){
+            //         Av_Node Temp=Open[i];
+            //         Open[i]=Open[IndexOfMax];
+            //         Open[IndexOfMax]=Temp;
+            //     }
+            // }
         }
-        return null;
+        return new('Av_Plan');
     }
 }
 
