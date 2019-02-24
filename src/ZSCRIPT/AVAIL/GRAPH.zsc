@@ -59,19 +59,18 @@ class Av_Graph:Av_Object{
                 }
             }
 
-            // TODO: Figure out what this does, not sure why there's a sort
-            // for(int i=0; i<Open.Size(); i++){
-            //     uint IndexOfMax=i;
-            //     for(int j=i+1; j<Open.Size(); j++){
-            //         if(FCosts[Nodes.Find(Open[j])]>FCosts[Nodes.Find(Open[IndexOfMax])])
-            //             IndexOfMax=j;
-            //     }
-            //     if(IndexOfMax!=i){
-            //         Av_Node Temp=Open[i];
-            //         Open[i]=Open[IndexOfMax];
-            //         Open[IndexOfMax]=Temp;
-            //     }
-            // }
+            for(int i=0; i<Open.Size(); i++){
+                uint IndexOfMax=i;
+                for(int j=i+1; j<Open.Size(); j++){
+                    if(FCosts[Nodes.Find(Open[j])]>FCosts[Nodes.Find(Open[IndexOfMax])])
+                        IndexOfMax=j;
+                }
+                if(IndexOfMax!=i){
+                    Av_Node Temp=Open[i];
+                    Open[i]=Open[IndexOfMax];
+                    Open[IndexOfMax]=Temp;
+                }
+            }
         }
         return new('Av_Plan');
     }
